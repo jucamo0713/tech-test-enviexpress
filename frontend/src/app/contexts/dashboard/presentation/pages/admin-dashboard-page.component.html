@@ -1,12 +1,13 @@
+<app-navbar />
+
 <main class="dashboard-page">
   <section class="topbar">
     <div>
-      <p class="eyebrow">Dashboard</p>
+      <p class="eyebrow">Panel de control</p>
       <h1>Rendimiento operativo</h1>
     </div>
     <div class="top-actions">
-      <a routerLink="/profile">Perfil</a>
-      <a routerLink="/operations">Paquetes</a>
+      <button (click)="loadStats()" [disabled]="isLoading()">Actualizar</button>
     </div>
   </section>
 
@@ -18,7 +19,7 @@
         [class.active]="form.controls.period.value === period"
         (click)="form.controls.period.setValue(period); loadStats()"
       >
-        {{ period }}
+        {{ periodNames[period] || period }}
       </button>
     </div>
     <input type="date" formControlName="date" />
@@ -57,7 +58,7 @@
         <div class="legend">
           <div class="legend-row" *ngFor="let item of currentStats.items">
             <span class="swatch" [style.background]="colorFor(item.status)"></span>
-            <strong>{{ item.status }}</strong>
+            <strong>{{ statusNames[item.status] || item.status }}</strong>
             <em>{{ item.total }}</em>
             <small>{{ percentageFor(item) }}%</small>
           </div>

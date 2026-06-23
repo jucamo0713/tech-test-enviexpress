@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, inject } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
 import { AuthSessionService } from '../../../auth/application/services/auth-session.service';
 
@@ -9,9 +9,15 @@ import { AuthSessionService } from '../../../auth/application/services/auth-sess
   templateUrl: './landing-page.component.html',
   styleUrl: './landing-page.component.css',
 })
-export class LandingPageComponent {
+export class LandingPageComponent implements OnInit {
   private readonly router = inject(Router);
   readonly session = inject(AuthSessionService);
+
+  ngOnInit(): void {
+    if (this.session.hasSession()) {
+      this.goToPanel();
+    }
+  }
 
   goToPanel(): void {
     const user = this.session.user();

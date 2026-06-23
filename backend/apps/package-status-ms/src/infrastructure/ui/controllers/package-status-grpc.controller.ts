@@ -2,6 +2,7 @@ import { Controller } from '@nestjs/common';
 import { QueryBus } from '@nestjs/cqrs';
 import { Observable } from 'rxjs';
 import { PackageStatusProto, RedisPubSubClient } from 'app/shared';
+import { CancelTimeoutDecorator } from '@shared/infrastructure/driven-adapters/nestjs/interceptors/timeout/timeout.decorators';
 import {
   GetPackageStatusQuery,
   TrackPackageStatusQuery,
@@ -29,6 +30,7 @@ export class PackageStatusGrpcController
     return this.queryBus.execute(new GetPackageStatusQuery(request.id));
   }
 
+  @CancelTimeoutDecorator()
   trackPackageStatus(
     request: PackageStatusProto.TrackPackageStatusRequest,
   ): Observable<PackageStatusProto.PackageStatusResponse> {

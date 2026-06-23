@@ -3,12 +3,13 @@ import { Component, OnInit, inject, signal } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { AuthSessionService } from '../../../auth/application/services/auth-session.service';
+import { NavbarComponent } from '../../../../shared/components/navbar/navbar.component';
 import { OperatorUser } from '../../domain/models/operator.model';
 import { OperatorsApiService } from '../../infrastructure/api/operators-api.service';
 
 @Component({
   selector: 'app-operators-list-page',
-  imports: [CommonModule, ReactiveFormsModule, RouterLink],
+  imports: [CommonModule, ReactiveFormsModule, RouterLink, NavbarComponent],
   templateUrl: './operators-list-page.component.html',
   styleUrl: './operators-list-page.component.css',
 })

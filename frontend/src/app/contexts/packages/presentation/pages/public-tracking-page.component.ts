@@ -1,7 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { Component, OnDestroy, OnInit, inject, signal } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
-import { ActivatedRoute, RouterLink } from '@angular/router';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { PackageItem, PACKAGE_STATUS_NAMES } from '../../domain/models/package.model';
 import { PackagesApiService } from '../../infrastructure/api/packages-api.service';
 
@@ -14,6 +14,7 @@ import { PackagesApiService } from '../../infrastructure/api/packages-api.servic
 export class PublicTrackingPageComponent implements OnInit, OnDestroy {
   private readonly fb = inject(FormBuilder);
   private readonly route = inject(ActivatedRoute);
+  private readonly router = inject(Router);
   private readonly packagesApi = inject(PackagesApiService);
   private eventSource?: EventSource;
 
@@ -41,12 +42,25 @@ export class PublicTrackingPageComponent implements OnInit, OnDestroy {
   }
 
   track(): void {
+    if (this.form.invalid) {
+      this.form.markAllAsTouched();
+      return;
+    }
+
+    const { trackingCode, email } = this.form.getRawValue();
+
+    void this.router.navigate([], {
+      relativeTo: this.route,
+      queryParams: { trackingCode, email },
+      queryParamsHandling: 'merge',
+      replaceUrl: true,
+    });
+
     this.errorMessage.set('');
     this.streamMessage.set('Conectando...');
     this.packageStatus.set(undefined);
     this.isTracking.set(true);
     this.eventSource?.close();
-    const { trackingCode, email } = this.form.getRawValue();
 
     this.packagesApi.publicStatus(trackingCode, email).subscribe({
       next: (packageStatus) => {

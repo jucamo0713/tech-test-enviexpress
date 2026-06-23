@@ -13,6 +13,7 @@ import {
 import { PackagesApiService } from '../../infrastructure/api/packages-api.service';
 import { PackageStatusPanelComponent } from '../components/package-status-panel.component';
 import { PackagesPanelComponent } from '../components/packages-panel.component';
+import { NavbarComponent } from '../../../../shared/components/navbar/navbar.component';
 
 @Component({
   selector: 'app-operations-dashboard-page',
@@ -21,6 +22,7 @@ import { PackagesPanelComponent } from '../components/packages-panel.component';
     RouterLink,
     PackagesPanelComponent,
     PackageStatusPanelComponent,
+    NavbarComponent,
   ],
   templateUrl: './operations-dashboard-page.component.html',
   styleUrl: './operations-dashboard-page.component.css',
@@ -33,6 +35,11 @@ export class OperationsDashboardPageComponent implements OnInit, OnDestroy {
   private eventSource?: EventSource;
 
   readonly user = this.session.user;
+  readonly roleNames: Record<string, string> = {
+    admin: 'Administrador',
+    operator: 'Operador',
+    client: 'Cliente',
+  };
   readonly packages = signal<PackageItem[]>([]);
   readonly selectedPackage = signal<PackageItem | undefined>(undefined);
   readonly streamMessage = signal('Sin conexión SSE');

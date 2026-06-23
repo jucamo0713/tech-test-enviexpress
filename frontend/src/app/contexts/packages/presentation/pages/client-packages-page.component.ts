@@ -3,12 +3,13 @@ import { Component, OnInit, inject, signal } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { AuthSessionService } from '../../../auth/application/services/auth-session.service';
+import { NavbarComponent } from '../../../../shared/components/navbar/navbar.component';
 import { PackageItem, PackageListFilters, PACKAGE_STATUS_NAMES } from '../../domain/models/package.model';
 import { PackagesApiService } from '../../infrastructure/api/packages-api.service';
 
 @Component({
   selector: 'app-client-packages-page',
-  imports: [CommonModule, ReactiveFormsModule, RouterLink],
+  imports: [CommonModule, ReactiveFormsModule, RouterLink, NavbarComponent],
   templateUrl: './client-packages-page.component.html',
   styleUrl: './client-packages-page.component.css',
 })

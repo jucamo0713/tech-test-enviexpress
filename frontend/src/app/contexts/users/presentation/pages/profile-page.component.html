@@ -1,10 +1,11 @@
+<app-navbar />
+
 <main class="profile-page">
   <section class="topbar">
     <div>
       <p class="eyebrow">Perfil</p>
       <h1>Mi cuenta</h1>
     </div>
-    <a [routerLink]="backRoute()">Volver</a>
   </section>
 
   <p class="empty" *ngIf="isLoading()">Cargando perfil...</p>

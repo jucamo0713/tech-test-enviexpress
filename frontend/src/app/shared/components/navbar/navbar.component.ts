@@ -1,6 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { Component, inject } from '@angular/core';
-import { RouterLink, RouterLinkActive } from '@angular/router';
+import { Router, RouterLink, RouterLinkActive } from '@angular/router';
 import { AuthSessionService } from '../../../contexts/auth/application/services/auth-session.service';
 
 @Component({
@@ -20,7 +20,7 @@ import { AuthSessionService } from '../../../contexts/auth/application/services/
         </div>
         <div class="user-actions">
           <span class="user-info">{{ user.name }} ({{ roleNames[user.role] || user.role }})</span>
-          <button (click)="session.logout()" class="logout-btn">Cerrar sesión</button>
+          <button (click)="logout()" class="logout-btn">Cerrar sesión</button>
         </div>
       </div>
     </nav>
@@ -120,6 +120,8 @@ import { AuthSessionService } from '../../../contexts/auth/application/services/
 })
 export class NavbarComponent {
   readonly session = inject(AuthSessionService);
+  private readonly router = inject(Router);
+
   readonly roleNames: Record<string, string> = {
     admin: 'Administrador',
     operator: 'Operador',
@@ -132,5 +134,10 @@ export class NavbarComponent {
 
   isClient(): boolean {
     return this.session.user()?.role === 'client';
+  }
+
+  logout(): void {
+    this.session.clear();
+    void this.router.navigateByUrl('/');
   }
 }

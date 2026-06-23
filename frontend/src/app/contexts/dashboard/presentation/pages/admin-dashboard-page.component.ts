@@ -1,7 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { Component, OnInit, computed, inject, signal } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule } from '@angular/forms';
-import { Router, RouterLink } from '@angular/router';
+import { Router } from '@angular/router';
 import { ChartData, ChartOptions } from 'chart.js';
 import { BaseChartDirective } from 'ng2-charts';
 import { AuthSessionService } from '../../../auth/application/services/auth-session.service';
@@ -12,7 +12,7 @@ import {
   PackageStatusStats,
 } from '../../domain/models/dashboard.model';
 import { DashboardApiService } from '../../infrastructure/api/dashboard-api.service';
-import { PACKAGE_STATUS_NAMES } from '../../packages/domain/models/package.model';
+import { PACKAGE_STATUS_NAMES } from '../../../packages/domain/models/package.model';
 
 const STATUS_COLORS: Record<string, string> = {
   created: '#2563eb',
@@ -29,7 +29,6 @@ const STATUS_COLORS: Record<string, string> = {
   imports: [
     CommonModule,
     ReactiveFormsModule,
-    RouterLink,
     BaseChartDirective,
     NavbarComponent,
   ],

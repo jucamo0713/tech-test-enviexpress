@@ -1,6 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { Component, OnDestroy, OnInit, inject, signal } from '@angular/core';
-import { Router, RouterLink } from '@angular/router';
+import { Router } from '@angular/router';
 import { AuthApiService } from '../../../auth/infrastructure/api/auth-api.service';
 import { AuthSessionService } from '../../../auth/application/services/auth-session.service';
 import {
@@ -19,7 +19,6 @@ import { NavbarComponent } from '../../../../shared/components/navbar/navbar.com
   selector: 'app-operations-dashboard-page',
   imports: [
     CommonModule,
-    RouterLink,
     PackagesPanelComponent,
     PackageStatusPanelComponent,
     NavbarComponent,

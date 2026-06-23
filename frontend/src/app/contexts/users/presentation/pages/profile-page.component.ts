@@ -1,7 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { Component, OnInit, inject, signal } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
-import { Router, RouterLink } from '@angular/router';
+import { Router } from '@angular/router';
 import { AuthSessionService } from '../../../auth/application/services/auth-session.service';
 import { NavbarComponent } from '../../../../shared/components/navbar/navbar.component';
 import { UserProfile } from '../../domain/models/profile.model';
@@ -9,7 +9,7 @@ import { ProfileApiService } from '../../infrastructure/api/profile-api.service'
 
 @Component({
   selector: 'app-profile-page',
-  imports: [CommonModule, ReactiveFormsModule, RouterLink, NavbarComponent],
+  imports: [CommonModule, ReactiveFormsModule, NavbarComponent],
   templateUrl: './profile-page.component.html',
   styleUrl: './profile-page.component.css',
 })

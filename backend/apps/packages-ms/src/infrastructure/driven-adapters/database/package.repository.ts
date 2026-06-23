@@ -133,25 +133,44 @@ export class PackageRepository {
     destinationAddress: string;
     changedBy: string;
   }): Promise<Package> {
-    const now = new Date();
-    const packageRecord = await this.packageModel.create({
-      id: randomUUID(),
-      trackingCode: `ENV-${Date.now().toString(36).toUpperCase()}`,
-      clientId: input.clientId,
-      description: input.description,
-      destinationAddress: input.destinationAddress,
-      status: 'created',
-      history: [
-        {
-          id: randomUUID(),
+    const maxRetries = 5;
+    let attempt = 0;
+
+    while (attempt < maxRetries) {
+      try {
+        const now = new Date();
+        const id = randomUUID();
+        const shortHash = id.split('-')[0].substring(0, 4).toUpperCase();
+        const packageRecord = await this.packageModel.create({
+          id,
+          trackingCode: `ENV-${Date.now().toString(36).toUpperCase()}-${shortHash}`,
+          clientId: input.clientId,
+          description: input.description,
+          destinationAddress: input.destinationAddress,
           status: 'created',
-          comment: 'Package created',
-          changedAt: now,
-          changedBy: input.changedBy,
-        },
-      ],
-    });
-    return this.toDomain(packageRecord);
+          history: [
+            {
+              id: randomUUID(),
+              status: 'created',
+              comment: 'Package created',
+              changedAt: now,
+              changedBy: input.changedBy,
+            },
+          ],
+        });
+        return this.toDomain(packageRecord);
+      } catch (error: any) {
+        if (error.code === 11000 && attempt < maxRetries - 1) {
+          attempt++;
+          continue;
+        }
+        throw error;
+      }
+    }
+
+    throw new Error(
+      'Failed to create package after multiple attempts due to duplicate keys',
+    );
   }
 
   async createSeed(input: {

@@ -1,6 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { Component, OnInit, inject, signal } from '@angular/core';
-import { Router, RouterLink } from '@angular/router';
+import { Router } from '@angular/router';
 import { AuthSessionService } from '../../../auth/application/services/auth-session.service';
 import { NavbarComponent } from '../../../../shared/components/navbar/navbar.component';
 import { Client, ClientRegistrationStats } from '../../domain/models/client.model';
@@ -8,7 +8,7 @@ import { ClientsApiService } from '../../infrastructure/api/clients-api.service'
 
 @Component({
   selector: 'app-clients-list-page',
-  imports: [CommonModule, RouterLink, NavbarComponent],
+  imports: [CommonModule, NavbarComponent],
   templateUrl: './clients-list-page.component.html',
   styleUrl: './clients-list-page.component.css',
 })

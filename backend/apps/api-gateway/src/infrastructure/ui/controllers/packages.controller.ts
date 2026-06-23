@@ -135,7 +135,7 @@ export class PackagesController {
       new GatewayTrackPackageStatusQuery(trackingCode, email),
     );
 
-    return this.createPackageStatusSse(stream as Observable<unknown>);
+    return this.createPackageStatusSse(stream as Observable<unknown>, false);
   }
 
   @Get(':id')
@@ -158,7 +158,7 @@ export class PackagesController {
 
   @Patch(':id')
   @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles('admin', 'operator')
+  @Roles('admin')
   update(
     @Param('id') id: string,
     @Body() request: UpdatePackageRequest,
@@ -201,7 +201,7 @@ export class PackagesController {
       ),
     );
 
-    return this.createPackageStatusSse(stream as Observable<unknown>);
+    return this.createPackageStatusSse(stream as Observable<unknown>, true);
   }
 
   @Delete(':id')
@@ -214,7 +214,10 @@ export class PackagesController {
     );
   }
 
-  private createPackageStatusSse(stream: Observable<unknown>): Observable<MessageEvent> {
+  private createPackageStatusSse(
+    stream: Observable<unknown>,
+    exposeActors: boolean,
+  ): Observable<MessageEvent> {
     return new Observable<MessageEvent>((subscriber) => {
       let heartbeatTimer: ReturnType<typeof setInterval> | undefined;
       const emitHeartbeat = () => {
@@ -237,7 +240,9 @@ export class PackagesController {
             type: 'package-status',
             data: {
               heartbeat: new Date().toISOString(),
-              package: this.toPublicPackageStatus(packageRecord),
+              package: exposeActors
+                ? packageRecord
+                : this.toPublicPackageStatus(packageRecord),
             },
           });
         },

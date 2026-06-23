@@ -119,6 +119,7 @@ export class UpdatePackageStatusUseCase {
         packageId: updated.id,
         trackingCode: updated.trackingCode,
         clientId: updated.clientId,
+        changedBy: payload.changedBy,
         status: updated.status,
         history: updated.history,
         updatedAt: updated.updatedAt,

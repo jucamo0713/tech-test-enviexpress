@@ -32,7 +32,8 @@ h1 {
   gap: 10px;
 }
 
-.session button {
+.session button,
+.session a {
   background: #0f766e;
   border: 0;
   border-radius: 6px;
@@ -41,6 +42,7 @@ h1 {
   font: inherit;
   min-height: 40px;
   padding: 8px 12px;
+  text-decoration: none;
 }
 
 .session button.ghost {
@@ -50,7 +52,7 @@ h1 {
 .workspace {
   display: grid;
   gap: 16px;
-  grid-template-columns: minmax(0, 1fr) minmax(0, 1.15fr) minmax(320px, 0.9fr);
+  grid-template-columns: minmax(0, 1.35fr) minmax(320px, 0.8fr);
   margin: 0 auto;
   max-width: 1180px;
 }

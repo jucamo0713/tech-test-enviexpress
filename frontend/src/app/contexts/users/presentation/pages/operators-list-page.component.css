@@ -1,0 +1,181 @@
+.operators-page {
+  background: #f8fafc;
+  min-height: 100dvh;
+  padding: 24px;
+}
+
+.topbar,
+.create-panel,
+.operators-list,
+.error,
+.empty,
+.pagination {
+  margin-left: auto;
+  margin-right: auto;
+  max-width: 1040px;
+}
+
+.topbar {
+  align-items: center;
+  display: flex;
+  gap: 16px;
+  justify-content: space-between;
+  margin-bottom: 20px;
+}
+
+.eyebrow {
+  color: #0f766e;
+  font-size: 13px;
+  font-weight: 700;
+  margin: 0;
+  text-transform: uppercase;
+}
+
+h1,
+h2,
+p {
+  margin: 0;
+}
+
+.topbar a {
+  background: #334155;
+  border-radius: 6px;
+  color: white;
+  padding: 10px 12px;
+  text-decoration: none;
+}
+
+.create-panel {
+  background: white;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  margin-bottom: 16px;
+  padding: 16px;
+}
+
+.create-panel form {
+  display: grid;
+  gap: 12px;
+  grid-template-columns: repeat(3, minmax(0, 1fr)) auto;
+  margin-top: 12px;
+}
+
+label {
+  color: #475569;
+  display: grid;
+  font-size: 13px;
+  font-weight: 700;
+  gap: 6px;
+}
+
+input {
+  border: 1px solid #cbd5e1;
+  border-radius: 6px;
+  font: inherit;
+  min-height: 40px;
+  padding: 8px 10px;
+}
+
+button {
+  border: 0;
+  border-radius: 6px;
+  cursor: pointer;
+  font: inherit;
+  font-weight: 700;
+  min-height: 40px;
+  padding: 8px 12px;
+}
+
+.create-panel button,
+.pagination button {
+  align-self: end;
+  background: #0f766e;
+  color: white;
+}
+
+button:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
+}
+
+.operators-list {
+  display: grid;
+  gap: 12px;
+}
+
+.operator-card {
+  align-items: center;
+  background: white;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  display: grid;
+  gap: 12px;
+  grid-template-columns: minmax(0, 1fr) auto minmax(150px, 0.5fr) auto;
+  padding: 16px;
+}
+
+.operator-card p {
+  color: #64748b;
+}
+
+.access-chip {
+  border-radius: 999px;
+  font-size: 13px;
+  font-weight: 700;
+  justify-self: start;
+  padding: 6px 10px;
+  white-space: nowrap;
+}
+
+.access-chip.active {
+  background: #ecfdf5;
+  color: #0f766e;
+}
+
+.access-chip.revoked {
+  background: #fee2e2;
+  color: #b91c1c;
+}
+
+.danger {
+  background: #fee2e2;
+  color: #b91c1c;
+}
+
+.error,
+.empty {
+  margin-bottom: 16px;
+}
+
+.error {
+  color: #b91c1c;
+}
+
+.empty {
+  color: #64748b;
+}
+
+.pagination {
+  align-items: center;
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+  margin-top: 20px;
+}
+
+@media (max-width: 860px) {
+  .operators-page {
+    padding: 16px;
+  }
+
+  .topbar,
+  .create-panel form,
+  .operator-card {
+    align-items: flex-start;
+    grid-template-columns: 1fr;
+  }
+
+  .topbar {
+    flex-direction: column;
+  }
+}

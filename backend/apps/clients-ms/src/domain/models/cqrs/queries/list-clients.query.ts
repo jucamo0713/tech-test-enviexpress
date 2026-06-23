@@ -1,4 +1,7 @@
 import { Query } from '@nestjs/cqrs';
-import type { Client } from '../../entities/client';
 
-export class ListClientsQuery extends Query<Client[]> {}
+export class ListClientsQuery extends Query<unknown> {
+  constructor(public readonly page: number, public readonly limit: number) {
+    super();
+  }
+}

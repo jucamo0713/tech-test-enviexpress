@@ -58,6 +58,47 @@ p {
   max-width: 980px;
 }
 
+.filters {
+  background: white;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  display: grid;
+  gap: 10px;
+  grid-template-columns: minmax(160px, 1fr) minmax(140px, 0.7fr) minmax(140px, 0.7fr) auto;
+  margin: 0 auto 16px;
+  max-width: 980px;
+  padding: 14px;
+}
+
+.filters input,
+.filters select {
+  border: 1px solid #cbd5e1;
+  border-radius: 6px;
+  font: inherit;
+  min-height: 40px;
+  padding: 8px 10px;
+}
+
+.filter-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.filter-actions button {
+  background: #0f766e;
+  border: 0;
+  border-radius: 6px;
+  color: white;
+  cursor: pointer;
+  font: inherit;
+  min-height: 40px;
+  padding: 8px 12px;
+}
+
+.filter-actions button:last-child {
+  background: #334155;
+}
+
 .package-card {
   background: white;
   border: 1px solid #e2e8f0;
@@ -131,6 +172,14 @@ small {
 
   .topbar {
     align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .filters {
+    grid-template-columns: 1fr;
+  }
+
+  .filter-actions {
     flex-direction: column;
   }
 }

@@ -10,6 +10,16 @@ import { GetUserByEmailQueryHandler } from '../infrastructure/ui/cqrs-handlers/g
 import { GetUserByIdQueryHandler } from '../infrastructure/ui/cqrs-handlers/get-user-by-id.query-handler';
 import { CreateClientUserUseCase } from '../domain/use-cases/create-client-user.use-case';
 import { CreateClientUserCommandHandler } from '../infrastructure/ui/cqrs-handlers/create-client-user.command-handler';
+import { ListRegisteredClientIdsUseCase } from '../domain/use-cases/list-registered-client-ids.use-case';
+import { ListRegisteredClientIdsQueryHandler } from '../infrastructure/ui/cqrs-handlers/list-registered-client-ids.query-handler';
+import { CountRegisteredClientsUseCase } from '../domain/use-cases/count-registered-clients.use-case';
+import { CountRegisteredClientsQueryHandler } from '../infrastructure/ui/cqrs-handlers/count-registered-clients.query-handler';
+import { ListOperatorsUseCase } from '../domain/use-cases/list-operators.use-case';
+import { CreateOperatorUseCase } from '../domain/use-cases/create-operator.use-case';
+import { RevokeOperatorAccessUseCase } from '../domain/use-cases/revoke-operator-access.use-case';
+import { ListOperatorsQueryHandler } from '../infrastructure/ui/cqrs-handlers/list-operators.query-handler';
+import { CreateOperatorCommandHandler } from '../infrastructure/ui/cqrs-handlers/create-operator.command-handler';
+import { RevokeOperatorAccessCommandHandler } from '../infrastructure/ui/cqrs-handlers/revoke-operator-access.command-handler';
 
 const EnsureDefaultAdminProvider = {
   provide: Symbol('ENSURE_DEFAULT_ADMIN_PROVIDER'),
@@ -49,10 +59,45 @@ const EnsureDefaultAdminProvider = {
       useFactory: (repository: UserRepository) =>
         new CreateClientUserUseCase(repository),
     },
+    {
+      provide: ListRegisteredClientIdsUseCase,
+      inject: [UserRepository],
+      useFactory: (repository: UserRepository) =>
+        new ListRegisteredClientIdsUseCase(repository),
+    },
+    {
+      provide: CountRegisteredClientsUseCase,
+      inject: [UserRepository],
+      useFactory: (repository: UserRepository) =>
+        new CountRegisteredClientsUseCase(repository),
+    },
+    {
+      provide: ListOperatorsUseCase,
+      inject: [UserRepository],
+      useFactory: (repository: UserRepository) =>
+        new ListOperatorsUseCase(repository),
+    },
+    {
+      provide: CreateOperatorUseCase,
+      inject: [UserRepository],
+      useFactory: (repository: UserRepository) =>
+        new CreateOperatorUseCase(repository),
+    },
+    {
+      provide: RevokeOperatorAccessUseCase,
+      inject: [UserRepository],
+      useFactory: (repository: UserRepository) =>
+        new RevokeOperatorAccessUseCase(repository),
+    },
     EnsureDefaultAdminProvider,
     CreateClientUserCommandHandler,
+    CreateOperatorCommandHandler,
+    RevokeOperatorAccessCommandHandler,
     GetUserByEmailQueryHandler,
     GetUserByIdQueryHandler,
+    ListRegisteredClientIdsQueryHandler,
+    CountRegisteredClientsQueryHandler,
+    ListOperatorsQueryHandler,
   ],
 })
 export class UsersModule {}

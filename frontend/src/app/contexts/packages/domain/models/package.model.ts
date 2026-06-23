@@ -2,6 +2,7 @@ export interface PackageHistoryItem {
   status: string;
   comment?: string;
   changedAt: string;
+  changedBy?: string;
 }
 
 export interface PackageItem {
@@ -29,7 +30,11 @@ export interface PackageListFilters {
 }
 
 export interface CreatePackageRequest {
-  clientId: string;
+  clientId?: string;
+  clientEmail: string;
+  clientName?: string;
+  clientPhone?: string;
+  clientAddress?: string;
   description: string;
   destinationAddress: string;
 }
@@ -37,4 +42,9 @@ export interface CreatePackageRequest {
 export interface UpdatePackageStatusRequest {
   status: string;
   comment?: string;
+}
+
+export interface UpdatePackageRequest {
+  description?: string;
+  destinationAddress?: string;
 }

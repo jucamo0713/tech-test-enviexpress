@@ -1,20 +1,75 @@
 import { firstValueFrom } from 'rxjs';
-import { AuditProto, ClientsProto } from 'app/shared';
+import { randomUUID } from 'node:crypto';
+import {
+  AUDIT_EVENTS_CHANNEL,
+  ClientsProto,
+  RedisPubSubClient,
+  UsersProto,
+} from 'app/shared';
 import { CreateClientRequest, UpdateClientRequest } from '../../infrastructure/dtos/clients/client.request';
 
 export class ClientsOrchestratorUseCase {
   constructor(
     private readonly clientsService: ClientsProto.ClientsServiceClient,
-    private readonly auditService: AuditProto.AuditServiceClient,
+    private readonly usersService: UsersProto.UsersServiceClient,
+    private readonly redisPubSub: RedisPubSubClient,
   ) {}
 
-  async list() {
-    const response = await firstValueFrom(this.clientsService.listClients({}));
-    return response.clients;
+  async list(page: number, limit: number, includeRegistrationStats = false) {
+    const response = await firstValueFrom(
+      this.clientsService.listClients({ page, limit }),
+    );
+    const clientIds = response.clients.map((client) => client.id);
+    const [registeredClientIds, registrationStats] = includeRegistrationStats
+      ? await Promise.all([
+        this.getRegisteredClientIds(clientIds),
+        this.getRegistrationStats(response.total),
+      ])
+      : [new Set<string>(), undefined];
+
+    return {
+      items: response.clients.map((client) => ({
+        ...client,
+        isRegistered: includeRegistrationStats
+          ? registeredClientIds.has(client.id)
+          : undefined,
+      })),
+      page: response.page,
+      limit: response.limit,
+      total: response.total,
+      totalPages: response.totalPages,
+      registrationStats,
+    };
+  }
+
+  async getRegistrationStats(totalClients: number) {
+    const response = await firstValueFrom(
+      this.usersService.countRegisteredClients({}),
+    );
+    const registered = Math.min(response.total, totalClients);
+    const unregistered = Math.max(totalClients - registered, 0);
+
+    return {
+      registered,
+      unregistered,
+      registeredPercentage: this.toPercentage(registered, totalClients),
+      unregisteredPercentage: this.toPercentage(unregistered, totalClients),
+    };
+  }
+
+  async getGlobalRegistrationStats() {
+    const response = await firstValueFrom(
+      this.clientsService.listClients({ page: 1, limit: 1 }),
+    );
+    return this.getRegistrationStats(response.total);
   }
 
   get(id: string) {
     return firstValueFrom(this.clientsService.getClient({ id }));
+  }
+
+  getByEmail(email: string) {
+    return firstValueFrom(this.clientsService.getClientByEmail({ email }));
   }
 
   async create(request: CreateClientRequest, userId?: string) {
@@ -44,14 +99,32 @@ export class ClientsOrchestratorUseCase {
     actorId: string,
     metadata: unknown,
   ): Promise<void> {
-    await firstValueFrom(
-      this.auditService.createAuditRecord({
-        entityType: 'client',
-        entityId,
-        action,
-        actorId,
-        metadata: JSON.stringify(metadata ?? {}),
-      }),
-    ).catch(() => undefined);
+    await this.redisPubSub
+      .publish(AUDIT_EVENTS_CHANNEL, {
+        id: randomUUID(),
+        name: `client.${action}`,
+        aggregateType: 'client',
+        aggregateId: entityId,
+        occurredAt: new Date().toISOString(),
+        requestId: '',
+        payload: {
+          eventType: action,
+          actorId,
+          metadata: metadata ?? {},
+        },
+      })
+      .catch(() => undefined);
+  }
+
+  private async getRegisteredClientIds(clientIds: string[]): Promise<Set<string>> {
+    const response = await firstValueFrom(
+      this.usersService.listRegisteredClientIds({ clientIds }),
+    );
+    return new Set(response.clientIds);
+  }
+
+  private toPercentage(count: number, total: number): number {
+    if (!total) return 0;
+    return Math.round((count / total) * 100);
   }
 }

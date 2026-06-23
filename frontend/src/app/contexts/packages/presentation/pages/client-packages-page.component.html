@@ -11,6 +11,20 @@
   </section>
 
   <p class="error" *ngIf="errorMessage()">{{ errorMessage() }}</p>
+
+  <form class="filters" [formGroup]="filtersForm" (ngSubmit)="applyFilters()">
+    <select formControlName="status">
+      <option value="">Todos los estados</option>
+      <option *ngFor="let status of statusOptions" [value]="status">{{ status }}</option>
+    </select>
+    <input type="date" formControlName="startDate" />
+    <input type="date" formControlName="endDate" />
+    <div class="filter-actions">
+      <button type="submit">Filtrar</button>
+      <button type="button" (click)="clearFilters()">Limpiar</button>
+    </div>
+  </form>
+
   <p class="empty" *ngIf="isLoading()">Cargando pedidos...</p>
   <p class="empty" *ngIf="!isLoading() && hasLoaded() && !errorMessage() && packages().length === 0">
     No tienes pedidos registrados.

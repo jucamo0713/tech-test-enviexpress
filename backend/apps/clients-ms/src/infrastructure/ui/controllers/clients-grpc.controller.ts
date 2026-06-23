@@ -5,6 +5,7 @@ import { CreateClientCommand } from '../../../domain/models/cqrs/commands/create
 import { DeleteClientCommand } from '../../../domain/models/cqrs/commands/delete-client.command';
 import { UpdateClientCommand } from '../../../domain/models/cqrs/commands/update-client.command';
 import { GetClientQuery } from '../../../domain/models/cqrs/queries/get-client.query';
+import { GetClientByEmailQuery } from '../../../domain/models/cqrs/queries/get-client-by-email.query';
 import { ListClientsQuery } from '../../../domain/models/cqrs/queries/list-clients.query';
 
 @Controller()
@@ -19,12 +20,23 @@ export class ClientsGrpcController implements ClientsProto.ClientsServiceControl
     return { status: 'ok' };
   }
 
-  async listClients(_request: ClientsProto.ListClientsRequest) {
-    return { clients: await this.queryBus.execute(new ListClientsQuery()) };
+  async listClients(
+    request: ClientsProto.ListClientsRequest,
+  ): Promise<ClientsProto.ListClientsResponse> {
+    return this.queryBus.execute(
+      new ListClientsQuery(
+        this.normalizePage(request.page),
+        this.normalizeLimit(request.limit),
+      ),
+    ) as Promise<ClientsProto.ListClientsResponse>;
   }
 
   getClient(request: ClientsProto.GetClientRequest) {
     return this.queryBus.execute(new GetClientQuery(request.id));
+  }
+
+  getClientByEmail(request: ClientsProto.GetClientByEmailRequest) {
+    return this.queryBus.execute(new GetClientByEmailQuery(request.email));
   }
 
   createClient(request: ClientsProto.CreateClientRequest) {
@@ -38,5 +50,13 @@ export class ClientsGrpcController implements ClientsProto.ClientsServiceControl
 
   deleteClient(request: ClientsProto.DeleteClientRequest) {
     return this.commandBus.execute(new DeleteClientCommand(request.id));
+  }
+
+  private normalizePage(page?: number): number {
+    return Math.max(Number(page || 1), 1);
+  }
+
+  private normalizeLimit(limit?: number): number {
+    return Math.min(Math.max(Number(limit || 10), 1), 100);
   }
 }

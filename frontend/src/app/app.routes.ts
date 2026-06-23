@@ -47,6 +47,22 @@ export const routes: Routes = [
       ).then((module) => module.OperationsDashboardPageComponent),
   },
   {
+    path: 'clients',
+    canActivate: [authGuard],
+    loadComponent: () =>
+      import(
+        './contexts/clients/presentation/pages/clients-list-page.component'
+      ).then((module) => module.ClientsListPageComponent),
+  },
+  {
+    path: 'operators',
+    canActivate: [authGuard],
+    loadComponent: () =>
+      import(
+        './contexts/users/presentation/pages/operators-list-page.component'
+      ).then((module) => module.OperatorsListPageComponent),
+  },
+  {
     path: '**',
     redirectTo: '',
   },

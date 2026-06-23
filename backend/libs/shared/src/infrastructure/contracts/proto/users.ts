@@ -34,6 +34,7 @@ export interface UserResponse {
   createdAt: string;
   updatedAt: string;
   clientId?: string | undefined;
+  active: boolean;
 }
 
 export interface CreateClientUserRequest {
@@ -41,6 +42,44 @@ export interface CreateClientUserRequest {
   passwordHash: string;
   name: string;
   clientId: string;
+}
+
+export interface ListRegisteredClientIdsRequest {
+  clientIds: string[];
+}
+
+export interface ListRegisteredClientIdsResponse {
+  clientIds: string[];
+}
+
+export interface CountRegisteredClientsRequest {
+}
+
+export interface CountRegisteredClientsResponse {
+  total: number;
+}
+
+export interface ListOperatorsRequest {
+  page: number;
+  limit: number;
+}
+
+export interface ListOperatorsResponse {
+  users: UserResponse[];
+  page: number;
+  limit: number;
+  total: number;
+  totalPages: number;
+}
+
+export interface CreateOperatorRequest {
+  email: string;
+  password: string;
+  name: string;
+}
+
+export interface RevokeOperatorAccessRequest {
+  id: string;
 }
 
 export const USERS_PACKAGE_NAME = "users";
@@ -53,6 +92,16 @@ export interface UsersServiceClient {
   getUserById(request: GetUserByIdRequest): Observable<UserResponse>;
 
   createClientUser(request: CreateClientUserRequest): Observable<UserResponse>;
+
+  listRegisteredClientIds(request: ListRegisteredClientIdsRequest): Observable<ListRegisteredClientIdsResponse>;
+
+  countRegisteredClients(request: CountRegisteredClientsRequest): Observable<CountRegisteredClientsResponse>;
+
+  listOperators(request: ListOperatorsRequest): Observable<ListOperatorsResponse>;
+
+  createOperator(request: CreateOperatorRequest): Observable<UserResponse>;
+
+  revokeOperatorAccess(request: RevokeOperatorAccessRequest): Observable<UserResponse>;
 }
 
 export interface UsersServiceController {
@@ -63,11 +112,39 @@ export interface UsersServiceController {
   getUserById(request: GetUserByIdRequest): Promise<UserResponse> | Observable<UserResponse> | UserResponse;
 
   createClientUser(request: CreateClientUserRequest): Promise<UserResponse> | Observable<UserResponse> | UserResponse;
+
+  listRegisteredClientIds(
+    request: ListRegisteredClientIdsRequest,
+  ): Promise<ListRegisteredClientIdsResponse> | Observable<ListRegisteredClientIdsResponse> | ListRegisteredClientIdsResponse;
+
+  countRegisteredClients(
+    request: CountRegisteredClientsRequest,
+  ): Promise<CountRegisteredClientsResponse> | Observable<CountRegisteredClientsResponse> | CountRegisteredClientsResponse;
+
+  listOperators(
+    request: ListOperatorsRequest,
+  ): Promise<ListOperatorsResponse> | Observable<ListOperatorsResponse> | ListOperatorsResponse;
+
+  createOperator(request: CreateOperatorRequest): Promise<UserResponse> | Observable<UserResponse> | UserResponse;
+
+  revokeOperatorAccess(
+    request: RevokeOperatorAccessRequest,
+  ): Promise<UserResponse> | Observable<UserResponse> | UserResponse;
 }
 
 export function UsersServiceControllerMethods() {
   return function (constructor: Function) {
-    const grpcMethods: string[] = ["health", "getUserByEmail", "getUserById", "createClientUser"];
+    const grpcMethods: string[] = [
+      "health",
+      "getUserByEmail",
+      "getUserById",
+      "createClientUser",
+      "listRegisteredClientIds",
+      "countRegisteredClients",
+      "listOperators",
+      "createOperator",
+      "revokeOperatorAccess",
+    ];
     for (const method of grpcMethods) {
       const descriptor: any = Reflect.getOwnPropertyDescriptor(constructor.prototype, method);
       GrpcMethod("UsersService", method)(constructor.prototype[method], method, descriptor);

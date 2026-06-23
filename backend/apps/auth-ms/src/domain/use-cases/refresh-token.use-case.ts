@@ -27,7 +27,7 @@ export class RefreshTokenUseCase {
       this.usersService.getUserById({ id: session.userId }),
     ).catch(() => null);
 
-    if (!user) throw new UnauthorizedException('Invalid refresh token');
+    if (!user || !user.active) throw new UnauthorizedException('Invalid refresh token');
 
     return this.issueTokens(user);
   }

@@ -5,7 +5,14 @@ import * as argon2 from 'argon2';
 import { randomUUID } from 'node:crypto';
 import { firstValueFrom } from 'rxjs';
 import type { EnvironmentVariables } from 'app/shared';
-import { AuthProto, ClientsProto, PackagesProto, UsersProto } from 'app/shared';
+import {
+  AUDIT_EVENTS_CHANNEL,
+  AuthProto,
+  ClientsProto,
+  PackagesProto,
+  RedisPubSubClient,
+  UsersProto,
+} from 'app/shared';
 import { AuthSessionRepository } from '../../infrastructure/driven-adapters/database/auth-session.repository';
 
 export class RegisterClientUseCase {
@@ -16,6 +23,7 @@ export class RegisterClientUseCase {
     private readonly sessionRepository: AuthSessionRepository,
     private readonly jwtService: JwtService,
     private readonly configService: ConfigService<EnvironmentVariables, true>,
+    private readonly redisPubSub: RedisPubSubClient,
   ) {}
 
   async execute(payload: AuthProto.RegisterClientRequest) {
@@ -41,7 +49,35 @@ export class RegisterClientUseCase {
       }),
     );
 
+    await this.auditClientRegistration(user, client.id, packageRecord.id);
+
     return this.issueTokens(user);
+  }
+
+  private async auditClientRegistration(
+    user: UsersProto.UserResponse,
+    clientId: string,
+    packageId: string,
+  ): Promise<void> {
+    await this.redisPubSub
+      .publish(AUDIT_EVENTS_CHANNEL, {
+        id: randomUUID(),
+        name: 'auth.client_registered',
+        aggregateType: 'user',
+        aggregateId: user.id,
+        occurredAt: new Date().toISOString(),
+        requestId: '',
+        payload: {
+          eventType: 'client_registered',
+          actorId: user.id,
+          metadata: {
+            clientId,
+            packageId,
+            email: user.email,
+          },
+        },
+      })
+      .catch(() => undefined);
   }
 
   private async issueTokens(user: UsersProto.UserResponse) {

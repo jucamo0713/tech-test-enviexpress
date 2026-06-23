@@ -26,7 +26,6 @@ export const envValidationSchema = Joi.object<EnvironmentVariables>({
   GRPC_CLIENTS_URL: Joi.string().required(),
   GRPC_PACKAGES_URL: Joi.string().required(),
   GRPC_PACKAGE_STATUS_URL: Joi.string().required(),
-  GRPC_AUDIT_URL: Joi.string().required(),
   JWT_ACCESS_SECRET: Joi.string().min(16).required(),
   JWT_ACCESS_EXPIRES_IN: Joi.string().required(),
   SWAGGER_ENABLED: Joi.boolean().optional(),

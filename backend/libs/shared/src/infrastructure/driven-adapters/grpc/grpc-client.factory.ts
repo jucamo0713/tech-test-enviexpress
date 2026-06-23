@@ -19,8 +19,7 @@ export type GrpcClientName =
   | 'users'
   | 'clients'
   | 'packages'
-  | 'packageStatus'
-  | 'audit';
+  | 'packageStatus';
 
 const GrpcClientSettings: Record<
   GrpcClientName,
@@ -30,11 +29,6 @@ const GrpcClientSettings: Record<
     urlEnv: keyof EnvironmentVariables;
   }
 > = {
-  audit: {
-    packageName: 'audit',
-    protoFile: GrpcProtoFiles.audit,
-    urlEnv: 'GRPC_AUDIT_URL',
-  },
   auth: {
     packageName: 'auth',
     protoFile: GrpcProtoFiles.auth,

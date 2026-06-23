@@ -1,18 +1,20 @@
 import { CommonModule } from '@angular/common';
 import { Component, OnInit, inject, signal } from '@angular/core';
+import { FormBuilder, ReactiveFormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { AuthSessionService } from '../../../auth/application/services/auth-session.service';
-import { PackageItem } from '../../domain/models/package.model';
+import { PackageItem, PackageListFilters } from '../../domain/models/package.model';
 import { PackagesApiService } from '../../infrastructure/api/packages-api.service';
 
 @Component({
   selector: 'app-client-packages-page',
-  imports: [CommonModule, RouterLink],
+  imports: [CommonModule, ReactiveFormsModule, RouterLink],
   templateUrl: './client-packages-page.component.html',
   styleUrl: './client-packages-page.component.css',
 })
 export class ClientPackagesPageComponent implements OnInit {
   private readonly router = inject(Router);
+  private readonly fb = inject(FormBuilder);
   private readonly session = inject(AuthSessionService);
   private readonly packagesApi = inject(PackagesApiService);
 
@@ -25,6 +27,22 @@ export class ClientPackagesPageComponent implements OnInit {
   readonly total = signal(0);
   readonly isLoading = signal(false);
   readonly hasLoaded = signal(false);
+  readonly filters = signal<PackageListFilters>({});
+  readonly statusOptions = [
+    'created',
+    'received',
+    'in_transit',
+    'failed_delivery',
+    'delivered',
+    'returned',
+    'cancelled',
+  ];
+
+  readonly filtersForm = this.fb.nonNullable.group({
+    status: [''],
+    startDate: [''],
+    endDate: [''],
+  });
 
   ngOnInit(): void {
     if (this.user()?.role !== 'client') {
@@ -47,10 +65,23 @@ export class ClientPackagesPageComponent implements OnInit {
     this.loadPackages();
   }
 
+  applyFilters(): void {
+    this.filters.set(this.normalizedFilters());
+    this.page.set(1);
+    this.loadPackages();
+  }
+
+  clearFilters(): void {
+    this.filtersForm.reset();
+    this.filters.set({});
+    this.page.set(1);
+    this.loadPackages();
+  }
+
   private loadPackages(): void {
     this.isLoading.set(true);
     this.errorMessage.set('');
-    this.packagesApi.listMine(this.page(), this.limit()).subscribe({
+    this.packagesApi.listMine(this.page(), this.limit(), this.filters()).subscribe({
       next: (response) => {
         this.packages.set(response.items);
         this.page.set(response.page);
@@ -71,5 +102,15 @@ export class ClientPackagesPageComponent implements OnInit {
   logout(): void {
     this.session.clear();
     void this.router.navigateByUrl('/');
+  }
+
+  private normalizedFilters(): PackageListFilters {
+    const filters = this.filtersForm.getRawValue();
+
+    return {
+      status: filters.status || undefined,
+      startDate: filters.startDate || undefined,
+      endDate: filters.endDate || undefined,
+    };
   }
 }

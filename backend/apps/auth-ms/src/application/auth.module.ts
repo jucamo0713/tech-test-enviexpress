@@ -12,7 +12,13 @@ import { RefreshTokenCommandHandler } from '../infrastructure/ui/cqrs-handlers/r
 import { RegisterClientCommandHandler } from '../infrastructure/ui/cqrs-handlers/register-client.command-handler';
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
-import { ClientsProto, GrpcClientFactory, PackagesProto, UsersProto } from 'app/shared';
+import {
+  ClientsProto,
+  GrpcClientFactory,
+  PackagesProto,
+  RedisPubSubClient,
+  UsersProto,
+} from 'app/shared';
 import type { EnvironmentVariables } from 'app/shared';
 
 const AuthGrpcClients = {
@@ -111,6 +117,7 @@ const AuthGrpcClients = {
         AuthSessionRepository,
         JwtService,
         ConfigService,
+        RedisPubSubClient,
       ],
       useFactory: (
         packagesClient: PackagesProto.PackagesServiceClient,
@@ -119,6 +126,7 @@ const AuthGrpcClients = {
         sessionRepository: AuthSessionRepository,
         jwtService: JwtService,
         configService: ConfigService<EnvironmentVariables, true>,
+        redisPubSub: RedisPubSubClient,
       ) =>
         new RegisterClientUseCase(
           packagesClient,
@@ -127,6 +135,7 @@ const AuthGrpcClients = {
           sessionRepository,
           jwtService,
           configService,
+          redisPubSub,
         ),
     },
     LoginCommandHandler,

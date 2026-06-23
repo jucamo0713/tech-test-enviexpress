@@ -1,10 +1,13 @@
 import { ForbiddenException } from '@nestjs/common';
-import { firstValueFrom } from 'rxjs';
+import { randomUUID } from 'node:crypto';
+import { firstValueFrom, from, mergeMap } from 'rxjs';
 import {
-  AuditProto,
+  AUDIT_EVENTS_CHANNEL,
   ClientsProto,
   PackagesProto,
   PackageStatusProto,
+  RedisPubSubClient,
+  UsersProto,
 } from 'app/shared';
 import {
   CreatePackageRequest,
@@ -25,7 +28,8 @@ export class PackagesOrchestratorUseCase {
     private readonly packagesService: PackagesProto.PackagesServiceClient,
     private readonly clientsService: ClientsProto.ClientsServiceClient,
     private readonly packageStatusService: PackageStatusProto.PackageStatusServiceClient,
-    private readonly auditService: AuditProto.AuditServiceClient,
+    private readonly usersService: UsersProto.UsersServiceClient,
+    private readonly redisPubSub: RedisPubSubClient,
   ) {}
 
   async list(
@@ -83,9 +87,14 @@ export class PackagesOrchestratorUseCase {
   }
 
   async create(request: CreatePackageRequest, userId: string) {
-    await firstValueFrom(this.clientsService.getClient({ id: request.clientId }));
+    const client = await this.resolvePackageClient(request, userId);
     const packageRecord = await firstValueFrom(
-      this.packagesService.createPackage({ ...request, changedBy: userId }),
+      this.packagesService.createPackage({
+        clientId: client.id,
+        description: request.description,
+        destinationAddress: request.destinationAddress,
+        changedBy: userId,
+      }),
     );
     await this.audit('package', packageRecord.id, 'created', userId, request);
     return packageRecord;
@@ -113,7 +122,6 @@ export class PackagesOrchestratorUseCase {
         comment,
       }),
     );
-    await this.audit('package', id, `status:${status}`, userId, { comment });
     return packageRecord;
   }
 
@@ -170,7 +178,9 @@ export class PackagesOrchestratorUseCase {
     return this.packageStatusService.trackPackageStatus({
       trackingCode: packageRecord.trackingCode,
       email: client.email,
-    });
+    }).pipe(
+      mergeMap((status) => from(this.enrichPackageActors(status))),
+    );
   }
 
   async delete(id: string, userId?: string) {
@@ -185,21 +195,56 @@ export class PackagesOrchestratorUseCase {
     actorId: string,
     metadata: unknown,
   ): Promise<void> {
-    await firstValueFrom(
-      this.auditService.createAuditRecord({
-        entityType,
-        entityId,
-        action,
-        actorId,
-        metadata: JSON.stringify(metadata ?? {}),
-      }),
-    ).catch(() => undefined);
+    await this.redisPubSub
+      .publish(AUDIT_EVENTS_CHANNEL, {
+        id: randomUUID(),
+        name: `${entityType}.${action}`,
+        aggregateType: entityType,
+        aggregateId: entityId,
+        occurredAt: new Date().toISOString(),
+        requestId: '',
+        payload: {
+          eventType: action,
+          actorId,
+          metadata: metadata ?? {},
+        },
+      })
+      .catch(() => undefined);
   }
 
   private assertClientOwnsPackage(packageClientId: string, requesterClientId?: string) {
     if (requesterClientId && packageClientId !== requesterClientId) {
       throw new ForbiddenException('Package does not belong to authenticated client');
     }
+  }
+
+  private async resolvePackageClient(
+    request: CreatePackageRequest,
+    userId: string,
+  ): Promise<ClientsProto.ClientResponse> {
+    if (request.clientId) {
+      return firstValueFrom(this.clientsService.getClient({ id: request.clientId }));
+    }
+
+    const existingClient = await firstValueFrom(
+      this.clientsService.getClientByEmail({ email: request.clientEmail }),
+    ).catch(() => null);
+
+    if (existingClient) return existingClient;
+
+    const createdClient = await firstValueFrom(
+      this.clientsService.createClient({
+        name: request.clientName ?? request.clientEmail,
+        email: request.clientEmail,
+        phone: request.clientPhone ?? '',
+        address: request.clientAddress ?? request.destinationAddress,
+      }),
+    );
+    await this.audit('client', createdClient.id, 'created', userId, {
+      source: 'package.create',
+      email: request.clientEmail,
+    });
+    return createdClient;
   }
 
   private toPaginatedResponse(response: PackagesProto.ListPackagesResponse) {
@@ -209,6 +254,32 @@ export class PackagesOrchestratorUseCase {
       limit: response.limit,
       total: response.total,
       totalPages: response.totalPages,
+    };
+  }
+
+  private async enrichPackageActors(
+    packageRecord: PackageStatusProto.PackageStatusResponse,
+  ): Promise<PackageStatusProto.PackageStatusResponse> {
+    const nameByUserId = new Map<string, string>();
+
+    await Promise.all(
+      packageRecord.history.map(async (history) => {
+        if (!history.changedBy || nameByUserId.has(history.changedBy)) return;
+
+        const user = await firstValueFrom(
+          this.usersService.getUserById({ id: history.changedBy }),
+        ).catch(() => null);
+
+        nameByUserId.set(history.changedBy, user?.name ?? history.changedBy);
+      }),
+    );
+
+    return {
+      ...packageRecord,
+      history: packageRecord.history.map((history) => ({
+        ...history,
+        changedBy: nameByUserId.get(history.changedBy) ?? history.changedBy,
+      })),
     };
   }
 }

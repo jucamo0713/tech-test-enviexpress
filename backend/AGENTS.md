@@ -76,7 +76,6 @@ Current validated variables:
 - `GRPC_CLIENTS_URL`
 - `GRPC_PACKAGES_URL`
 - `GRPC_PACKAGE_STATUS_URL`
-- `GRPC_AUDIT_URL`
 
 Runtime usage:
 
@@ -109,7 +108,6 @@ GRPC_USERS_URL=0.0.0.0:50052
 GRPC_CLIENTS_URL=0.0.0.0:50053
 GRPC_PACKAGES_URL=0.0.0.0:50054
 GRPC_PACKAGE_STATUS_URL=0.0.0.0:50055
-GRPC_AUDIT_URL=0.0.0.0:50056
 ```
 
 Environment validation must stay centralized in `shared`; feature apps must not import `ConfigModule` directly or duplicate environment schemas.

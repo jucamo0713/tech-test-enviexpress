@@ -1,0 +1,54 @@
+<main class="clients-page">
+  <section class="topbar">
+    <div>
+      <p class="eyebrow">Clientes</p>
+      <h1>Listado de clientes</h1>
+    </div>
+    <a routerLink="/operations">Volver a paquetes</a>
+  </section>
+
+  <p class="error" *ngIf="errorMessage()">{{ errorMessage() }}</p>
+  <p class="empty" *ngIf="isLoading()">Cargando clientes...</p>
+
+  <section class="registration-summary" *ngIf="registrationStats() as stats">
+    <div class="summary-chip registered">
+      <strong>{{ stats.registeredPercentage }}%</strong>
+      <span>{{ stats.registered }} registrados</span>
+    </div>
+    <div class="summary-chip unregistered">
+      <strong>{{ stats.unregisteredPercentage }}%</strong>
+      <span>{{ stats.unregistered }} sin registro</span>
+    </div>
+  </section>
+
+  <section class="clients-list">
+    <article class="client-card" *ngFor="let client of clients()">
+      <div>
+        <h2>{{ client.name }}</h2>
+        <p>{{ client.email }}</p>
+      </div>
+      <p>{{ client.phone }}</p>
+      <p>{{ client.address }}</p>
+      <div class="chips">
+        <span class="status-chip">{{ client.active ? 'Activo' : 'Inactivo' }}</span>
+        <span
+          class="registration-chip"
+          [class.registered]="client.isRegistered"
+          [class.unregistered]="!client.isRegistered"
+        >
+          {{ client.isRegistered ? 'Registrado en app' : 'Sin registro en app' }}
+        </span>
+      </div>
+    </article>
+  </section>
+
+  <nav class="pagination" *ngIf="total() > limit()">
+    <button type="button" (click)="previousPage()" [disabled]="page() <= 1">
+      Anterior
+    </button>
+    <span>Pagina {{ page() }} de {{ totalPages() }}</span>
+    <button type="button" (click)="nextPage()" [disabled]="page() >= totalPages()">
+      Siguiente
+    </button>
+  </nav>
+</main>

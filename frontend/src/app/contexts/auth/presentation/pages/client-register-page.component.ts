@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, inject } from '@angular/core';
+import { Component, inject, signal } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { AuthSessionService } from '../../application/services/auth-session.service';
@@ -17,7 +17,7 @@ export class ClientRegisterPageComponent {
   private readonly authApi = inject(AuthApiService);
   private readonly session = inject(AuthSessionService);
 
-  errorMessage = '';
+  readonly errorMessage = signal('');
 
   readonly form = this.fb.nonNullable.group({
     trackingCode: ['', [Validators.required]],
@@ -26,7 +26,7 @@ export class ClientRegisterPageComponent {
   });
 
   register(): void {
-    this.errorMessage = '';
+    this.errorMessage.set('');
     const { trackingCode, email, password } = this.form.getRawValue();
 
     this.authApi.registerClient(trackingCode, email, password).subscribe({
@@ -35,7 +35,7 @@ export class ClientRegisterPageComponent {
         void this.router.navigateByUrl('/client/packages');
       },
       error: () => {
-        this.errorMessage = 'No se pudo validar la guia con ese correo';
+        this.errorMessage.set('No se pudo validar la guia con ese correo');
       },
     });
   }

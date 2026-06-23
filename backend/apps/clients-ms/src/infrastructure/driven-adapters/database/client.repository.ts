@@ -1,6 +1,12 @@
 import { Inject, Injectable, NotFoundException } from '@nestjs/common';
 import { Model } from 'mongoose';
 import { randomUUID } from 'node:crypto';
+import {
+  LimitValueObject,
+  MongoAggregationUtils,
+  PageValueObject,
+  type PaginatedAggregationResult,
+} from 'app/shared';
 import type { Client } from '../../../domain/models/entities/client';
 import { ClientDocument } from './client.schema';
 import { DatabaseClientConfigConstants } from './database-client-config.constants';
@@ -15,6 +21,27 @@ export class ClientRepository {
   async list(): Promise<Client[]> {
     const clients = await this.clientModel.find().sort({ createdAt: -1 }).lean();
     return clients.map((client) => this.toDomain(client));
+  }
+
+  async listPaginated(input: {
+    page: number;
+    limit: number;
+  }): Promise<{ clients: Client[]; total: number }> {
+    const page = Math.max(input.page, 1);
+    const limit = Math.max(input.limit, 1);
+    const result = await this.clientModel.aggregate<PaginatedAggregationResult<ClientDocument>[number]>(
+      MongoAggregationUtils.buildPaginationPipeline<ClientDocument>(
+        new PageValueObject(page),
+        new LimitValueObject(limit),
+        { sort: { createdAt: -1 } },
+      ),
+    );
+    const aggregation = result[0];
+
+    return {
+      clients: (aggregation?.data ?? []).map((client) => this.toDomain(client)),
+      total: aggregation?.total?.total ?? 0,
+    };
   }
 
   async get(id: string): Promise<Client> {

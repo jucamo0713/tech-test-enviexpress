@@ -14,7 +14,6 @@ export interface GrpcMicroserviceConfig {
   protoFile: string;
   urlEnv: keyof Pick<
     EnvironmentVariables,
-    | 'GRPC_AUDIT_URL'
     | 'GRPC_AUTH_URL'
     | 'GRPC_CLIENTS_URL'
     | 'GRPC_PACKAGES_URL'

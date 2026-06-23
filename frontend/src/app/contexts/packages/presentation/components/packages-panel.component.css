@@ -7,13 +7,39 @@
 
 h2 {
   font-size: 18px;
+  margin: 0;
+}
+
+.panel-header {
+  align-items: center;
+  display: flex;
+  gap: 12px;
+  justify-content: space-between;
   margin: 0 0 16px;
 }
 
+.edit-form,
 form,
 .list {
   display: grid;
   gap: 10px;
+}
+
+.filters {
+  border-top: 1px solid #dbe4e7;
+  margin-top: 16px;
+  padding-top: 16px;
+}
+
+.edit-form {
+  border-top: 1px solid #dbe4e7;
+  margin-top: 16px;
+  padding-top: 16px;
+}
+
+.edit-form h3 {
+  font-size: 15px;
+  margin: 0;
 }
 
 .list {
@@ -29,6 +55,13 @@ select {
   padding: 8px 10px;
 }
 
+.email-row,
+.form-actions {
+  display: grid;
+  gap: 10px;
+  grid-template-columns: minmax(0, 1fr) auto;
+}
+
 button {
   background: #0f766e;
   border: 0;
@@ -38,6 +71,14 @@ button {
   font: inherit;
   min-height: 40px;
   padding: 8px 12px;
+}
+
+button.ghost {
+  background: #334155;
+}
+
+button.danger {
+  background: #b91c1c;
 }
 
 button:disabled {
@@ -50,13 +91,60 @@ button:disabled {
   border: 1px solid #dbe4e7;
   color: #17202a;
   display: grid;
+  gap: 10px;
+  grid-template-columns: minmax(0, 1fr) auto;
+  padding: 10px;
+}
+
+.row-main {
+  background: transparent;
+  border: 0;
+  color: #17202a;
+  display: grid;
   gap: 3px;
   justify-items: start;
+  min-height: auto;
+  padding: 0;
   text-align: left;
 }
 
-.row em {
+.row-main em {
   color: #0f766e;
   font-style: normal;
   font-weight: 700;
+}
+
+.row-actions {
+  align-items: center;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.hint {
+  color: #334155;
+  font-size: 13px;
+  margin: 0;
+}
+
+.checkbox-row {
+  align-items: center;
+  color: #334155;
+  display: flex;
+  gap: 8px;
+}
+
+.checkbox-row input {
+  min-height: auto;
+}
+
+@media (max-width: 560px) {
+  .email-row,
+  .form-actions {
+    grid-template-columns: 1fr;
+  }
+
+  .row {
+    grid-template-columns: 1fr;
+  }
 }

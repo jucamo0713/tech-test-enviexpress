@@ -6,6 +6,7 @@ import { DatabaseClientModelProvider } from '../infrastructure/driven-adapters/d
 import { CreateClientUseCase } from '../domain/use-cases/create-client.use-case';
 import { DeleteClientUseCase } from '../domain/use-cases/delete-client.use-case';
 import { GetClientUseCase } from '../domain/use-cases/get-client.use-case';
+import { GetClientByEmailUseCase } from '../domain/use-cases/get-client-by-email.use-case';
 import { ListClientsUseCase } from '../domain/use-cases/list-clients.use-case';
 import { UpdateClientUseCase } from '../domain/use-cases/update-client.use-case';
 import { EnsureDefaultClientsUseCase } from '../domain/use-cases/ensure-default-clients.use-case';
@@ -13,6 +14,7 @@ import {
   CreateClientCommandHandler,
   DeleteClientCommandHandler,
   GetClientQueryHandler,
+  GetClientByEmailQueryHandler,
   ListClientsQueryHandler,
   UpdateClientCommandHandler,
 } from '../infrastructure/ui/cqrs-handlers/client.handlers';
@@ -38,6 +40,7 @@ const EnsureDefaultClientsProvider = {
       DeleteClientUseCase,
       ListClientsUseCase,
       GetClientUseCase,
+      GetClientByEmailUseCase,
       EnsureDefaultClientsUseCase,
     ].map((useCase) => ({
       provide: useCase,
@@ -50,6 +53,7 @@ const EnsureDefaultClientsProvider = {
     DeleteClientCommandHandler,
     ListClientsQueryHandler,
     GetClientQueryHandler,
+    GetClientByEmailQueryHandler,
   ],
 })
 export class ClientsModule {}

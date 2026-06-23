@@ -7,6 +7,11 @@ service UsersService {
   rpc GetUserByEmail (GetUserByEmailRequest) returns (UserResponse);
   rpc GetUserById (GetUserByIdRequest) returns (UserResponse);
   rpc CreateClientUser (CreateClientUserRequest) returns (UserResponse);
+  rpc ListRegisteredClientIds (ListRegisteredClientIdsRequest) returns (ListRegisteredClientIdsResponse);
+  rpc CountRegisteredClients (CountRegisteredClientsRequest) returns (CountRegisteredClientsResponse);
+  rpc ListOperators (ListOperatorsRequest) returns (ListOperatorsResponse);
+  rpc CreateOperator (CreateOperatorRequest) returns (UserResponse);
+  rpc RevokeOperatorAccess (RevokeOperatorAccessRequest) returns (UserResponse);
 }
 
 message HealthRequest {}
@@ -32,6 +37,7 @@ message UserResponse {
   string createdAt = 6;
   string updatedAt = 7;
   optional string clientId = 8;
+  bool active = 9;
 }
 
 message CreateClientUserRequest {
@@ -39,4 +45,41 @@ message CreateClientUserRequest {
   string passwordHash = 2;
   string name = 3;
   string clientId = 4;
+}
+
+message ListRegisteredClientIdsRequest {
+  repeated string clientIds = 1;
+}
+
+message ListRegisteredClientIdsResponse {
+  repeated string clientIds = 1;
+}
+
+message CountRegisteredClientsRequest {}
+
+message CountRegisteredClientsResponse {
+  int32 total = 1;
+}
+
+message ListOperatorsRequest {
+  int32 page = 1;
+  int32 limit = 2;
+}
+
+message ListOperatorsResponse {
+  repeated UserResponse users = 1;
+  int32 page = 2;
+  int32 limit = 3;
+  int32 total = 4;
+  int32 totalPages = 5;
+}
+
+message CreateOperatorRequest {
+  string email = 1;
+  string password = 2;
+  string name = 3;
+}
+
+message RevokeOperatorAccessRequest {
+  string id = 1;
 }

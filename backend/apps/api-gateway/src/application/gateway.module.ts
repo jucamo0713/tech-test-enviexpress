@@ -1,20 +1,26 @@
 import { Module } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import { JwtModule } from '@nestjs/jwt';
+import { JwtService } from '@nestjs/jwt';
 import {
-  AuditProto,
   AuthProto,
   ClientsProto,
+  EnvironmentVariables,
   GrpcClientFactory,
   PackagesProto,
   PackageStatusProto,
+  RedisPubSubClient,
   SharedModule,
+  UsersProto,
 } from 'app/shared';
 import { AuthOrchestratorUseCase } from '../domain/use-cases/auth-orchestrator.use-case';
 import { ClientsOrchestratorUseCase } from '../domain/use-cases/clients-orchestrator.use-case';
 import { PackagesOrchestratorUseCase } from '../domain/use-cases/packages-orchestrator.use-case';
+import { UsersOrchestratorUseCase } from '../domain/use-cases/users-orchestrator.use-case';
 import { AuthController } from '../infrastructure/ui/controllers/auth.controller';
 import { ClientsController } from '../infrastructure/ui/controllers/clients.controller';
 import { PackagesController } from '../infrastructure/ui/controllers/packages.controller';
+import { UsersController } from '../infrastructure/ui/controllers/users.controller';
 import { JwtAuthGuard } from '../infrastructure/guards/jwt-auth.guard';
 import { RolesGuard } from '../infrastructure/guards/roles.guard';
 import {
@@ -23,6 +29,8 @@ import {
   GatewayClientQueryHandlers,
   GatewayPackageCommandHandlers,
   GatewayPackageQueryHandlers,
+  GatewayUserCommandHandlers,
+  GatewayUserQueryHandlers,
 } from '../infrastructure/ui/cqrs-handlers/gateway.handlers';
 
 const GatewayGrpcClients = {
@@ -30,12 +38,12 @@ const GatewayGrpcClients = {
   CLIENTS: Symbol('GATEWAY_CLIENTS_GRPC_CLIENT'),
   PACKAGES: Symbol('GATEWAY_PACKAGES_GRPC_CLIENT'),
   PACKAGE_STATUS: Symbol('GATEWAY_PACKAGE_STATUS_GRPC_CLIENT'),
-  AUDIT: Symbol('GATEWAY_AUDIT_GRPC_CLIENT'),
+  USERS: Symbol('GATEWAY_USERS_GRPC_CLIENT'),
 } as const;
 
 @Module({
   imports: [SharedModule, JwtModule.register({})],
-  controllers: [AuthController, ClientsController, PackagesController],
+  controllers: [AuthController, ClientsController, PackagesController, UsersController],
   providers: [
     {
       provide: GatewayGrpcClients.AUTH,
@@ -78,13 +86,13 @@ const GatewayGrpcClients = {
           ),
     },
     {
-      provide: GatewayGrpcClients.AUDIT,
+      provide: GatewayGrpcClients.USERS,
       inject: [GrpcClientFactory],
-      useFactory: (factory: GrpcClientFactory): AuditProto.AuditServiceClient =>
+      useFactory: (factory: GrpcClientFactory): UsersProto.UsersServiceClient =>
         factory
-          .create('audit')
-          .getService<AuditProto.AuditServiceClient>(
-            AuditProto.AUDIT_SERVICE_NAME,
+          .create('users')
+          .getService<UsersProto.UsersServiceClient>(
+            UsersProto.USERS_SERVICE_NAME,
           ),
     },
     {
@@ -95,32 +103,54 @@ const GatewayGrpcClients = {
     },
     {
       provide: ClientsOrchestratorUseCase,
-      inject: [GatewayGrpcClients.CLIENTS, GatewayGrpcClients.AUDIT],
+      inject: [GatewayGrpcClients.CLIENTS, GatewayGrpcClients.USERS, RedisPubSubClient],
       useFactory: (
         clientsClient: ClientsProto.ClientsServiceClient,
-        auditClient: AuditProto.AuditServiceClient,
-      ) => new ClientsOrchestratorUseCase(clientsClient, auditClient),
+        usersClient: UsersProto.UsersServiceClient,
+        redisPubSub: RedisPubSubClient,
+      ) => new ClientsOrchestratorUseCase(clientsClient, usersClient, redisPubSub),
     },
-    JwtAuthGuard,
+    {
+      provide: UsersOrchestratorUseCase,
+      inject: [GatewayGrpcClients.USERS],
+      useFactory: (usersClient: UsersProto.UsersServiceClient) =>
+        new UsersOrchestratorUseCase(usersClient),
+    },
+    {
+      provide: JwtAuthGuard,
+      inject: [JwtService, ConfigService, GatewayGrpcClients.USERS],
+      useFactory: (
+        jwtService: JwtService,
+        configService: ConfigService<EnvironmentVariables, true>,
+        usersClient: UsersProto.UsersServiceClient,
+      ) => new JwtAuthGuard(
+        jwtService,
+        configService,
+        usersClient,
+      ),
+    },
     {
       provide: PackagesOrchestratorUseCase,
       inject: [
         GatewayGrpcClients.PACKAGES,
         GatewayGrpcClients.CLIENTS,
         GatewayGrpcClients.PACKAGE_STATUS,
-        GatewayGrpcClients.AUDIT,
+        GatewayGrpcClients.USERS,
+        RedisPubSubClient,
       ],
       useFactory: (
         packagesClient: PackagesProto.PackagesServiceClient,
         clientsClient: ClientsProto.ClientsServiceClient,
         packageStatusClient: PackageStatusProto.PackageStatusServiceClient,
-        auditClient: AuditProto.AuditServiceClient,
+        usersClient: UsersProto.UsersServiceClient,
+        redisPubSub: RedisPubSubClient,
       ) =>
         new PackagesOrchestratorUseCase(
           packagesClient,
           clientsClient,
           packageStatusClient,
-          auditClient,
+          usersClient,
+          redisPubSub,
         ),
     },
     RolesGuard,
@@ -129,6 +159,8 @@ const GatewayGrpcClients = {
     ...GatewayClientQueryHandlers,
     ...GatewayPackageCommandHandlers,
     ...GatewayPackageQueryHandlers,
+    ...GatewayUserCommandHandlers,
+    ...GatewayUserQueryHandlers,
   ],
 })
 export class GatewayModule {}

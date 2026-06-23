@@ -18,10 +18,16 @@ export interface HealthResponse {
 }
 
 export interface ListClientsRequest {
+  page: number;
+  limit: number;
 }
 
 export interface GetClientRequest {
   id: string;
+}
+
+export interface GetClientByEmailRequest {
+  email: string;
 }
 
 export interface CreateClientRequest {
@@ -61,6 +67,10 @@ export interface ClientResponse {
 
 export interface ListClientsResponse {
   clients: ClientResponse[];
+  page: number;
+  limit: number;
+  total: number;
+  totalPages: number;
 }
 
 export const CLIENTS_PACKAGE_NAME = "clients";
@@ -71,6 +81,8 @@ export interface ClientsServiceClient {
   listClients(request: ListClientsRequest): Observable<ListClientsResponse>;
 
   getClient(request: GetClientRequest): Observable<ClientResponse>;
+
+  getClientByEmail(request: GetClientByEmailRequest): Observable<ClientResponse>;
 
   createClient(request: CreateClientRequest): Observable<ClientResponse>;
 
@@ -88,6 +100,10 @@ export interface ClientsServiceController {
 
   getClient(request: GetClientRequest): Promise<ClientResponse> | Observable<ClientResponse> | ClientResponse;
 
+  getClientByEmail(
+    request: GetClientByEmailRequest,
+  ): Promise<ClientResponse> | Observable<ClientResponse> | ClientResponse;
+
   createClient(request: CreateClientRequest): Promise<ClientResponse> | Observable<ClientResponse> | ClientResponse;
 
   updateClient(request: UpdateClientRequest): Promise<ClientResponse> | Observable<ClientResponse> | ClientResponse;
@@ -103,6 +119,7 @@ export function ClientsServiceControllerMethods() {
       "health",
       "listClients",
       "getClient",
+      "getClientByEmail",
       "createClient",
       "updateClient",
       "deleteClient",

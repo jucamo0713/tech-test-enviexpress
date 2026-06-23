@@ -21,9 +21,23 @@ export class GatewayRegisterClientCommand extends Command<unknown> {
   }
 }
 
-export class GatewayListClientsQuery extends Query<unknown[]> {}
+export class GatewayListClientsQuery extends Query<unknown> {
+  constructor(
+    public readonly page: number,
+    public readonly limit: number,
+    public readonly includeRegistrationStats = false,
+  ) {
+    super();
+  }
+}
+export class GatewayGetClientRegistrationStatsQuery extends Query<unknown> {
+  constructor() { super(); }
+}
 export class GatewayGetClientQuery extends Query<unknown> {
   constructor(public readonly id: string) { super(); }
+}
+export class GatewayGetClientByEmailQuery extends Query<unknown> {
+  constructor(public readonly email: string) { super(); }
 }
 export class GatewayCreateClientCommand extends Command<unknown> {
   constructor(public readonly payload: unknown, public readonly userId: string) { super(); }
@@ -33,6 +47,18 @@ export class GatewayUpdateClientCommand extends Command<unknown> {
 }
 export class GatewayDeleteClientCommand extends Command<void> {
   constructor(public readonly id: string, public readonly userId: string) { super(); }
+}
+
+export class GatewayListOperatorsQuery extends Query<unknown> {
+  constructor(public readonly page: number, public readonly limit: number) {
+    super();
+  }
+}
+export class GatewayCreateOperatorCommand extends Command<unknown> {
+  constructor(public readonly payload: unknown) { super(); }
+}
+export class GatewayRevokeOperatorAccessCommand extends Command<unknown> {
+  constructor(public readonly id: string) { super(); }
 }
 
 export class GatewayListPackagesQuery extends Query<unknown> {

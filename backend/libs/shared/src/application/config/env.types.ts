@@ -17,7 +17,6 @@ export interface EnvironmentVariables {
   GRPC_CLIENTS_URL: string;
   GRPC_PACKAGES_URL: string;
   GRPC_PACKAGE_STATUS_URL: string;
-  GRPC_AUDIT_URL: string;
   JWT_ACCESS_SECRET: string;
   JWT_ACCESS_EXPIRES_IN: string;
   SWAGGER_ENABLED?: boolean;

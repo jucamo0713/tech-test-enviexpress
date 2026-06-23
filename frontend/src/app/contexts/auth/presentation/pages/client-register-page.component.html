@@ -7,6 +7,6 @@
     <label>Contrasena <input type="password" formControlName="password" /></label>
     <button type="submit" [disabled]="form.invalid">Crear acceso</button>
     <a routerLink="/">Volver al inicio</a>
-    <p class="error" *ngIf="errorMessage">{{ errorMessage }}</p>
+    <p class="error" *ngIf="errorMessage()">{{ errorMessage() }}</p>
   </form>
 </main>

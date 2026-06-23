@@ -6,25 +6,27 @@
     </div>
     <div class="session" *ngIf="user() as currentUser">
       <span>{{ currentUser.name }} · {{ currentUser.role }}</span>
+      <a *ngIf="isAdmin()" routerLink="/clients">Clientes</a>
+      <a *ngIf="isAdmin()" routerLink="/operators">Operadores</a>
       <button type="button" (click)="refresh()">Refresh</button>
       <button type="button" class="ghost" (click)="logout()">Cerrar sesion</button>
     </div>
   </section>
 
   <section class="workspace">
-    <app-clients-panel
-      [clients]="clients"
-      (createClient)="createClient($event)"
-    />
     <app-packages-panel
-      [clients]="clients"
-      [packages]="packages"
+      [packages]="packages()"
+      [isAdmin]="isAdmin()"
+      [canCreate]="canCreatePackages()"
       (createPackage)="createPackage($event)"
+      (updatePackage)="updatePackage($event)"
+      (deletePackage)="deletePackage($event)"
+      (filtersChange)="applyFilters($event)"
       (selectPackage)="openPackage($event)"
     />
     <app-package-status-panel
-      [selectedPackage]="selectedPackage"
-      [streamMessage]="streamMessage"
+      [selectedPackage]="selectedPackage()"
+      [streamMessage]="streamMessage()"
       (updateStatus)="updateStatus($event)"
     />
   </section>

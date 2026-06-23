@@ -5,33 +5,33 @@
     <form [formGroup]="form" (ngSubmit)="track()">
       <label>Numero de guia <input formControlName="trackingCode" /></label>
       <label>Correo asociado <input formControlName="email" /></label>
-      <button type="submit" [disabled]="form.invalid || isTracking">
-        {{ isTracking ? 'Consultando...' : 'Rastrear' }}
+      <button type="submit" [disabled]="form.invalid || isTracking()">
+        {{ isTracking() ? 'Consultando...' : 'Rastrear' }}
       </button>
     </form>
     <a routerLink="/">Volver al inicio</a>
-    <p class="error" *ngIf="errorMessage">{{ errorMessage }}</p>
+    <p class="error" *ngIf="errorMessage()">{{ errorMessage() }}</p>
   </section>
 
-  <section class="result" *ngIf="packageStatus">
+  <section class="result" *ngIf="packageStatus() as currentPackage">
     <div class="status-header">
       <div>
         <p class="eyebrow">Estado actual</p>
-        <h2>{{ packageStatus.status }}</h2>
+        <h2>{{ currentPackage.status }}</h2>
       </div>
-      <span>{{ packageStatus.trackingCode }}</span>
+      <span>{{ currentPackage.trackingCode }}</span>
     </div>
 
     <div class="package-summary">
-      <p>{{ packageStatus.description }}</p>
-      <small>{{ packageStatus.destinationAddress }}</small>
-      <small>{{ streamMessage }}</small>
+      <p>{{ currentPackage.description }}</p>
+      <small>{{ currentPackage.destinationAddress }}</small>
+      <small>{{ streamMessage() }}</small>
     </div>
 
     <div class="timeline">
       <p class="eyebrow">Tracking</p>
       <ol>
-        <li *ngFor="let history of packageStatus.history">
+        <li *ngFor="let history of currentPackage.history">
           <span class="dot"></span>
           <div>
             <strong>{{ history.status }}</strong>

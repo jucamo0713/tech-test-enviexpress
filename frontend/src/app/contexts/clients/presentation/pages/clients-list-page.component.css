@@ -1,0 +1,192 @@
+.clients-page {
+  background: #f8fafc;
+  min-height: 100dvh;
+  padding: 24px;
+}
+
+.topbar {
+  align-items: center;
+  display: flex;
+  gap: 16px;
+  justify-content: space-between;
+  margin: 0 auto 20px;
+  max-width: 980px;
+}
+
+.eyebrow {
+  color: #0f766e;
+  font-size: 13px;
+  font-weight: 700;
+  margin: 0;
+  text-transform: uppercase;
+}
+
+h1,
+h2,
+p {
+  margin: 0;
+}
+
+.topbar a {
+  background: #334155;
+  border-radius: 6px;
+  color: white;
+  padding: 10px 12px;
+  text-decoration: none;
+}
+
+.clients-list {
+  display: grid;
+  gap: 12px;
+  margin: 0 auto;
+  max-width: 980px;
+}
+
+.registration-summary {
+  display: grid;
+  gap: 12px;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  margin: 0 auto 16px;
+  max-width: 980px;
+}
+
+.summary-chip {
+  align-items: center;
+  background: white;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  display: flex;
+  gap: 12px;
+  min-height: 72px;
+  padding: 14px 16px;
+}
+
+.summary-chip strong {
+  font-size: 28px;
+  line-height: 1;
+}
+
+.summary-chip span {
+  color: #475569;
+  font-weight: 700;
+}
+
+.summary-chip.registered {
+  border-color: #99f6e4;
+}
+
+.summary-chip.registered strong {
+  color: #0f766e;
+}
+
+.summary-chip.unregistered {
+  border-color: #fed7aa;
+}
+
+.summary-chip.unregistered strong {
+  color: #c2410c;
+}
+
+.client-card {
+  background: white;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  display: grid;
+  gap: 8px;
+  grid-template-columns: minmax(0, 1.2fr) minmax(140px, 0.6fr) minmax(180px, 1fr) auto;
+  padding: 16px;
+}
+
+.chips {
+  align-items: flex-end;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.status-chip,
+.registration-chip {
+  border-radius: 999px;
+  display: inline-flex;
+  font-size: 13px;
+  font-weight: 700;
+  justify-content: center;
+  line-height: 1.2;
+  padding: 6px 10px;
+  white-space: nowrap;
+}
+
+.status-chip {
+  background: #ecfdf5;
+  color: #0f766e;
+}
+
+.registration-chip.registered {
+  background: #e0f2fe;
+  color: #0369a1;
+}
+
+.registration-chip.unregistered {
+  background: #fff7ed;
+  color: #c2410c;
+}
+
+.error,
+.empty {
+  margin: 0 auto 16px;
+  max-width: 980px;
+}
+
+.error {
+  color: #b91c1c;
+}
+
+.empty {
+  color: #64748b;
+}
+
+.pagination {
+  align-items: center;
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+  margin: 20px auto 0;
+  max-width: 980px;
+}
+
+.pagination button {
+  background: #0f766e;
+  border: 0;
+  border-radius: 6px;
+  color: white;
+  cursor: pointer;
+  font: inherit;
+  min-height: 38px;
+  padding: 8px 12px;
+}
+
+.pagination button:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
+}
+
+@media (max-width: 760px) {
+  .clients-page {
+    padding: 16px;
+  }
+
+  .topbar,
+  .registration-summary,
+  .client-card {
+    align-items: flex-start;
+    grid-template-columns: 1fr;
+  }
+
+  .topbar {
+    flex-direction: column;
+  }
+
+  .chips {
+    align-items: flex-start;
+  }
+}

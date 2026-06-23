@@ -61,7 +61,6 @@ services:
       GRPC_CLIENTS_URL: clients-ms:50053
       GRPC_PACKAGES_URL: packages-ms:50054
       GRPC_PACKAGE_STATUS_URL: package-status-ms:50055
-      GRPC_AUDIT_URL: audit-ms:50056
       JWT_ACCESS_SECRET: change-me-super-secret
       JWT_ACCESS_EXPIRES_IN: 15m
       SWAGGER_ENABLED: "true"
@@ -174,9 +173,6 @@ services:
         condition: service_healthy
     environment:
       <<: *backend-env
-      GRPC_AUDIT_URL: 0.0.0.0:50056
-    expose:
-      - "50056"
 
   frontend:
     build:

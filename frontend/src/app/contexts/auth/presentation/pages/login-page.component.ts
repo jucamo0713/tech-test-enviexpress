@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, inject } from '@angular/core';
+import { Component, inject, signal } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { RouterLink } from '@angular/router';
@@ -18,7 +18,7 @@ export class LoginPageComponent {
   private readonly authApi = inject(AuthApiService);
   private readonly session = inject(AuthSessionService);
 
-  errorMessage = '';
+  readonly errorMessage = signal('');
 
   readonly form = this.fb.nonNullable.group({
     email: ['', [Validators.required, Validators.email]],
@@ -26,7 +26,7 @@ export class LoginPageComponent {
   });
 
   login(): void {
-    this.errorMessage = '';
+    this.errorMessage.set('');
     const { email, password } = this.form.getRawValue();
 
     this.authApi.login(email, password).subscribe({
@@ -37,7 +37,7 @@ export class LoginPageComponent {
         );
       },
       error: () => {
-        this.errorMessage = 'No se pudo iniciar sesion';
+        this.errorMessage.set('No se pudo iniciar sesion');
       },
     });
   }

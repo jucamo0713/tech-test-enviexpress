@@ -6,6 +6,7 @@ service ClientsService {
   rpc Health (HealthRequest) returns (HealthResponse);
   rpc ListClients (ListClientsRequest) returns (ListClientsResponse);
   rpc GetClient (GetClientRequest) returns (ClientResponse);
+  rpc GetClientByEmail (GetClientByEmailRequest) returns (ClientResponse);
   rpc CreateClient (CreateClientRequest) returns (ClientResponse);
   rpc UpdateClient (UpdateClientRequest) returns (ClientResponse);
   rpc DeleteClient (DeleteClientRequest) returns (DeleteClientResponse);
@@ -17,10 +18,17 @@ message HealthResponse {
   string status = 1;
 }
 
-message ListClientsRequest {}
+message ListClientsRequest {
+  int32 page = 1;
+  int32 limit = 2;
+}
 
 message GetClientRequest {
   string id = 1;
+}
+
+message GetClientByEmailRequest {
+  string email = 1;
 }
 
 message CreateClientRequest {
@@ -60,4 +68,8 @@ message ClientResponse {
 
 message ListClientsResponse {
   repeated ClientResponse clients = 1;
+  int32 page = 2;
+  int32 limit = 3;
+  int32 total = 4;
+  int32 totalPages = 5;
 }

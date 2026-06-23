@@ -1,19 +1,24 @@
 import { CommandHandler, ICommandHandler, IQueryHandler, QueryHandler } from '@nestjs/cqrs';
 import {
   GatewayCreateClientCommand,
+  GatewayCreateOperatorCommand,
   GatewayCreatePackageCommand,
   GatewayDeleteClientCommand,
+  GatewayGetClientRegistrationStatsQuery,
   GatewayDeletePackageCommand,
   GatewayGetClientQuery,
+  GatewayGetClientByEmailQuery,
   GatewayGetPackageQuery,
   GatewayGetPackageStatusQuery,
   GatewayGetPublicPackageStatusQuery,
   GatewayListClientsQuery,
   GatewayListClientPackagesQuery,
   GatewayListPackagesQuery,
+  GatewayListOperatorsQuery,
   GatewayLoginCommand,
   GatewayRefreshTokenCommand,
   GatewayRegisterClientCommand,
+  GatewayRevokeOperatorAccessCommand,
   GatewayTrackPackageStatusByIdQuery,
   GatewayTrackPackageStatusQuery,
   GatewayUpdateClientCommand,
@@ -23,6 +28,7 @@ import {
 import { AuthOrchestratorUseCase } from '../../../domain/use-cases/auth-orchestrator.use-case';
 import { ClientsOrchestratorUseCase } from '../../../domain/use-cases/clients-orchestrator.use-case';
 import { PackagesOrchestratorUseCase } from '../../../domain/use-cases/packages-orchestrator.use-case';
+import { UsersOrchestratorUseCase } from '../../../domain/use-cases/users-orchestrator.use-case';
 
 @CommandHandler(GatewayLoginCommand)
 export class GatewayLoginCommandHandler implements ICommandHandler<GatewayLoginCommand> {
@@ -47,13 +53,36 @@ export class GatewayRegisterClientCommandHandler implements ICommandHandler<Gate
 @QueryHandler(GatewayListClientsQuery)
 export class GatewayListClientsQueryHandler implements IQueryHandler<GatewayListClientsQuery> {
   constructor(private readonly useCase: ClientsOrchestratorUseCase) {}
-  execute() { return this.useCase.list(); }
+  execute(query: GatewayListClientsQuery) {
+    return this.useCase.list(
+      query.page,
+      query.limit,
+      query.includeRegistrationStats,
+    );
+  }
+}
+
+@QueryHandler(GatewayGetClientRegistrationStatsQuery)
+export class GatewayGetClientRegistrationStatsQueryHandler
+  implements IQueryHandler<GatewayGetClientRegistrationStatsQuery>
+{
+  constructor(private readonly useCase: ClientsOrchestratorUseCase) {}
+
+  execute(_query: GatewayGetClientRegistrationStatsQuery) {
+    return this.useCase.getGlobalRegistrationStats();
+  }
 }
 
 @QueryHandler(GatewayGetClientQuery)
 export class GatewayGetClientQueryHandler implements IQueryHandler<GatewayGetClientQuery> {
   constructor(private readonly useCase: ClientsOrchestratorUseCase) {}
   execute(query: GatewayGetClientQuery) { return this.useCase.get(query.id); }
+}
+
+@QueryHandler(GatewayGetClientByEmailQuery)
+export class GatewayGetClientByEmailQueryHandler implements IQueryHandler<GatewayGetClientByEmailQuery> {
+  constructor(private readonly useCase: ClientsOrchestratorUseCase) {}
+  execute(query: GatewayGetClientByEmailQuery) { return this.useCase.getByEmail(query.email); }
 }
 
 @CommandHandler(GatewayCreateClientCommand)
@@ -72,6 +101,34 @@ export class GatewayUpdateClientCommandHandler implements ICommandHandler<Gatewa
 export class GatewayDeleteClientCommandHandler implements ICommandHandler<GatewayDeleteClientCommand> {
   constructor(private readonly useCase: ClientsOrchestratorUseCase) {}
   execute(command: GatewayDeleteClientCommand) { return this.useCase.delete(command.id, command.userId); }
+}
+
+@QueryHandler(GatewayListOperatorsQuery)
+export class GatewayListOperatorsQueryHandler implements IQueryHandler<GatewayListOperatorsQuery> {
+  constructor(private readonly useCase: UsersOrchestratorUseCase) {}
+  execute(query: GatewayListOperatorsQuery) {
+    return this.useCase.listOperators(query.page, query.limit);
+  }
+}
+
+@CommandHandler(GatewayCreateOperatorCommand)
+export class GatewayCreateOperatorCommandHandler
+  implements ICommandHandler<GatewayCreateOperatorCommand>
+{
+  constructor(private readonly useCase: UsersOrchestratorUseCase) {}
+  execute(command: GatewayCreateOperatorCommand) {
+    return this.useCase.createOperator(command.payload as never);
+  }
+}
+
+@CommandHandler(GatewayRevokeOperatorAccessCommand)
+export class GatewayRevokeOperatorAccessCommandHandler
+  implements ICommandHandler<GatewayRevokeOperatorAccessCommand>
+{
+  constructor(private readonly useCase: UsersOrchestratorUseCase) {}
+  execute(command: GatewayRevokeOperatorAccessCommand) {
+    return this.useCase.revokeOperatorAccess(command.id);
+  }
 }
 
 @QueryHandler(GatewayListPackagesQuery)
@@ -178,7 +235,16 @@ export const GatewayClientCommandHandlers = [
 ];
 export const GatewayClientQueryHandlers = [
   GatewayListClientsQueryHandler,
+  GatewayGetClientRegistrationStatsQueryHandler,
   GatewayGetClientQueryHandler,
+  GatewayGetClientByEmailQueryHandler,
+];
+export const GatewayUserCommandHandlers = [
+  GatewayCreateOperatorCommandHandler,
+  GatewayRevokeOperatorAccessCommandHandler,
+];
+export const GatewayUserQueryHandlers = [
+  GatewayListOperatorsQueryHandler,
 ];
 export const GatewayPackageCommandHandlers = [
   GatewayCreatePackageCommandHandler,

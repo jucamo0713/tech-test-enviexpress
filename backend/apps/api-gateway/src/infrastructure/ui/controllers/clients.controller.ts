@@ -7,6 +7,7 @@ import {
   Param,
   Patch,
   Post,
+  Query,
   Req,
   UseGuards,
 } from '@nestjs/common';
@@ -23,6 +24,8 @@ import type { AuthenticatedUser } from '../../guards/authenticated-user';
 import {
   GatewayCreateClientCommand,
   GatewayDeleteClientCommand,
+  GatewayGetClientRegistrationStatsQuery,
+  GatewayGetClientByEmailQuery,
   GatewayGetClientQuery,
   GatewayListClientsQuery,
   GatewayUpdateClientCommand,
@@ -39,19 +42,37 @@ export class ClientsController {
   ) {}
 
   @Get()
+  @Roles('admin')
+  list(@Query('page') page?: string, @Query('limit') limit?: string) {
+    return this.queryBus.execute(
+      new GatewayListClientsQuery(
+        this.normalizePage(page),
+        this.normalizeLimit(limit),
+        true,
+      ),
+    );
+  }
+
+  @Get('registration-stats')
+  @Roles('admin')
+  registrationStats() {
+    return this.queryBus.execute(new GatewayGetClientRegistrationStatsQuery());
+  }
+
+  @Get('by-email')
   @Roles('admin', 'operator')
-  list() {
-    return this.queryBus.execute(new GatewayListClientsQuery());
+  getByEmail(@Query('email') email: string) {
+    return this.queryBus.execute(new GatewayGetClientByEmailQuery(email));
   }
 
   @Get(':id')
-  @Roles('admin', 'operator')
+  @Roles('admin')
   get(@Param('id') id: string) {
     return this.queryBus.execute(new GatewayGetClientQuery(id));
   }
 
   @Post()
-  @Roles('admin', 'operator')
+  @Roles('admin')
   create(@Body() request: CreateClientRequest, @Req() req: AuthenticatedRequest) {
     return this.commandBus.execute(
       new GatewayCreateClientCommand(request, req.user.sub),
@@ -59,7 +80,7 @@ export class ClientsController {
   }
 
   @Patch(':id')
-  @Roles('admin', 'operator')
+  @Roles('admin')
   update(
     @Param('id') id: string,
     @Body() request: UpdateClientRequest,
@@ -77,5 +98,13 @@ export class ClientsController {
     return this.commandBus.execute(
       new GatewayDeleteClientCommand(id, req.user.sub),
     );
+  }
+
+  private normalizePage(page?: string): number {
+    return Math.max(Number(page || 1), 1);
+  }
+
+  private normalizeLimit(limit?: string): number {
+    return Math.min(Math.max(Number(limit || 10), 1), 100);
   }
 }

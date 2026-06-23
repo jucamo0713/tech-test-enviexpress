@@ -7,6 +7,7 @@ export interface User {
   name: string;
   role: UserRole;
   clientId?: string;
+  active: boolean;
   createdAt: string;
   updatedAt: string;
 }

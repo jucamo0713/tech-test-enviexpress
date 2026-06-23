@@ -15,7 +15,6 @@ const validEnvironmentVariables = {
   GRPC_CLIENTS_URL: '0.0.0.0:50053',
   GRPC_PACKAGES_URL: '0.0.0.0:50054',
   GRPC_PACKAGE_STATUS_URL: '0.0.0.0:50055',
-  GRPC_AUDIT_URL: '0.0.0.0:50056',
   JWT_ACCESS_SECRET: 'test-super-secret',
   JWT_ACCESS_EXPIRES_IN: '15m',
   SWAGGER_ENABLED: true,

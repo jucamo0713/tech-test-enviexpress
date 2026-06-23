@@ -847,6 +847,7 @@ Pipeline por pull request:
 
 Ademas de este README, la entrega final deberia incluir:
 
+- [`README_DEPLOY_AWS.md`](./README_DEPLOY_AWS.md) con la propuesta de despliegue en AWS usando ECR, ECS Fargate, ALB/API Gateway, ElastiCache Redis, MongoDB Atlas y VPC privada.
 - `DECISIONS.md` con trade-offs, alternativas descartadas y mejoras futuras.
 - Diagrama actualizado si la implementacion cambia.
 - Coleccion de peticiones o Swagger exportado.

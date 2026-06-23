@@ -25,6 +25,9 @@ export class UserDocument {
   @Prop({ required: false, index: true })
   clientId?: string;
 
+  @Prop({ default: true, index: true })
+  active!: boolean;
+
   createdAt!: Date;
   updatedAt!: Date;
 }

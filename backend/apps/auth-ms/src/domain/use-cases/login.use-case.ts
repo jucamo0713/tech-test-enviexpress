@@ -22,7 +22,7 @@ export class LoginUseCase {
       this.usersService.getUserByEmail({ email }),
     ).catch(() => null);
 
-    if (!user || !(await argon2.verify(user.passwordHash, password))) {
+    if (!user || !user.active || !(await argon2.verify(user.passwordHash, password))) {
       throw new UnauthorizedException('Invalid credentials');
     }
 

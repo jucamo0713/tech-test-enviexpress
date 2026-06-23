@@ -8,6 +8,7 @@ import {
   PaginatedPackages,
   PackageListFilters,
   PackageItem,
+  UpdatePackageRequest,
   UpdatePackageStatusRequest,
 } from '../../domain/models/package.model';
 
@@ -43,6 +44,17 @@ export class PackagesApiService {
       `${this.config.apiBaseUrl}/packages/${id}/status`,
       request,
     );
+  }
+
+  update(id: string, request: UpdatePackageRequest): Observable<PackageItem> {
+    return this.http.patch<PackageItem>(
+      `${this.config.apiBaseUrl}/packages/${id}`,
+      request,
+    );
+  }
+
+  delete(id: string): Observable<void> {
+    return this.http.delete<void>(`${this.config.apiBaseUrl}/packages/${id}`);
   }
 
   publicStatus(trackingCode: string, email: string): Observable<PackageItem> {

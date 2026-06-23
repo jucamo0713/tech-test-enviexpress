@@ -1,19 +1,70 @@
 <article class="panel">
-  <h2>Paquetes</h2>
-  <form [formGroup]="form" (ngSubmit)="submit()">
-    <select formControlName="clientId">
-      <option value="">Cliente</option>
-      <option *ngFor="let client of clients" [value]="client.id">{{ client.name }}</option>
-    </select>
-    <input placeholder="Descripcion" formControlName="description" />
-    <input placeholder="Destino" formControlName="destinationAddress" />
-    <button type="submit" [disabled]="form.invalid">Crear paquete</button>
+  <header class="panel-header">
+    <h2>Paquetes</h2>
+    <button type="button" (click)="startCreate()" *ngIf="canCreate && !isCreating()">Crear</button>
+  </header>
+
+  <form [formGroup]="form" (ngSubmit)="submit()" *ngIf="canCreate && isCreating()">
+    <div class="email-row">
+      <input placeholder="Correo del destinatario" formControlName="clientEmail" />
+      <button type="button" (click)="lookupClient()" [disabled]="form.controls.clientEmail.invalid || isLookingUpClient()">
+        {{ isLookingUpClient() ? 'Buscando...' : 'Buscar' }}
+      </button>
+    </div>
+    <p class="hint" *ngIf="lookupMessage()">{{ lookupMessage() }}</p>
+
+    <ng-container *ngIf="clientLookupCompleted() && !foundClient()">
+      <input placeholder="Nombre del destinatario" formControlName="clientName" />
+      <input placeholder="Telefono" formControlName="clientPhone" />
+      <input placeholder="Direccion del cliente" formControlName="clientAddress" (input)="syncClientAddress()" />
+    </ng-container>
+
+    <input placeholder="Descripcion del paquete" formControlName="description" />
+    <label class="checkbox-row">
+      <input type="checkbox" formControlName="useClientAddress" (change)="toggleUseClientAddress()" />
+      <span>Usar direccion del cliente</span>
+    </label>
+    <input placeholder="Direccion destino" formControlName="destinationAddress" />
+    <div class="form-actions">
+      <button type="submit" [disabled]="!canSubmit()">Crear paquete</button>
+      <button type="button" class="ghost" (click)="cancelCreate()">Cancelar</button>
+    </div>
   </form>
+
+  <form class="edit-form" [formGroup]="editForm" (ngSubmit)="submitEdit()" *ngIf="isAdmin && editingPackage() as packageToEdit">
+    <h3>Editar {{ packageToEdit.trackingCode }}</h3>
+    <input placeholder="Descripcion" formControlName="description" />
+    <input placeholder="Direccion destino" formControlName="destinationAddress" />
+    <div class="form-actions">
+      <button type="submit" [disabled]="editForm.invalid">Guardar</button>
+      <button type="button" class="ghost" (click)="cancelEdit()">Cancelar</button>
+    </div>
+  </form>
+
+  <form class="filters" [formGroup]="filtersForm" (ngSubmit)="applyFilters()">
+    <select formControlName="status">
+      <option value="">Todos los estados</option>
+      <option *ngFor="let status of statusOptions" [value]="status">{{ status }}</option>
+    </select>
+    <input type="date" formControlName="startDate" />
+    <input type="date" formControlName="endDate" />
+    <div class="form-actions">
+      <button type="submit">Filtrar</button>
+      <button type="button" class="ghost" (click)="clearFilters()">Limpiar</button>
+    </div>
+  </form>
+
   <div class="list">
-    <button type="button" class="row" *ngFor="let packageItem of packages" (click)="selectPackage.emit(packageItem)">
-      <strong>{{ packageItem.trackingCode }}</strong>
-      <span>{{ packageItem.description }}</span>
-      <em>{{ packageItem.status }}</em>
-    </button>
+    <div class="row" *ngFor="let packageItem of packages">
+      <button type="button" class="row-main" (click)="selectPackage.emit(packageItem)">
+        <strong>{{ packageItem.trackingCode }}</strong>
+        <span>{{ packageItem.description }}</span>
+        <em>{{ packageItem.status }}</em>
+      </button>
+      <div class="row-actions" *ngIf="isAdmin">
+        <button type="button" (click)="startEdit(packageItem)">Editar</button>
+        <button type="button" class="danger" (click)="requestDelete(packageItem)">Eliminar</button>
+      </div>
+    </div>
   </div>
 </article>

@@ -1,9 +1,27 @@
-import { IsIn, IsOptional, IsString, MinLength } from 'class-validator';
+import { IsEmail, IsIn, IsOptional, IsString, MinLength, ValidateIf } from 'class-validator';
 import type { PackageStatus } from '../../../domain/use-cases/packages-orchestrator.use-case';
 
 export class CreatePackageRequest {
+  @IsOptional()
   @IsString()
-  clientId!: string;
+  clientId?: string;
+
+  @IsEmail()
+  clientEmail!: string;
+
+  @ValidateIf((request: CreatePackageRequest) => !request.clientId)
+  @IsString()
+  @MinLength(2)
+  clientName?: string;
+
+  @ValidateIf((request: CreatePackageRequest) => !request.clientId)
+  @IsString()
+  clientPhone?: string;
+
+  @ValidateIf((request: CreatePackageRequest) => !request.clientId)
+  @IsString()
+  @MinLength(5)
+  clientAddress?: string;
 
   @IsString()
   @MinLength(3)

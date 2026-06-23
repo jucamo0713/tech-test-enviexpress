@@ -15,6 +15,16 @@ import type { PackageStatus } from '../../../domain/state-machine/package-state-
 import { PackageDocument } from './package.schema';
 import { DatabasePackageConfigConstants } from './database-package-config.constants';
 
+const PACKAGE_STATUSES = [
+  'created',
+  'received',
+  'in_transit',
+  'failed_delivery',
+  'delivered',
+  'returned',
+  'cancelled',
+];
+
 @Injectable()
 export class PackageRepository {
   constructor(
@@ -222,6 +232,31 @@ export class PackageRepository {
   async delete(id: string): Promise<void> {
     const result = await this.packageModel.deleteOne({ id });
     if (!result.deletedCount) throw new NotFoundException('Package not found');
+  }
+
+  async getStatusStats(input: {
+    startDate: string;
+    endDate: string;
+  }): Promise<Array<{ status: string; total: number }>> {
+    const result = await this.packageModel.aggregate<{ status: string; total: number }>([
+      { $unwind: '$history' },
+      {
+        $match: {
+          'history.changedAt': {
+            $gte: new Date(input.startDate),
+            $lte: new Date(input.endDate),
+          },
+        },
+      },
+      { $group: { _id: '$history.status', total: { $sum: 1 } } },
+      { $project: { _id: 0, status: '$_id', total: 1 } },
+    ]);
+    const totalByStatus = new Map(result.map((item) => [item.status, item.total]));
+
+    return PACKAGE_STATUSES.map((status) => ({
+      status,
+      total: totalByStatus.get(status) ?? 0,
+    }));
   }
 
   private buildListFilter(input: {

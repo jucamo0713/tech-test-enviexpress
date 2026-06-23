@@ -82,6 +82,17 @@ export interface RevokeOperatorAccessRequest {
   id: string;
 }
 
+export interface UpdateProfileRequest {
+  id: string;
+  name: string;
+}
+
+export interface ChangePasswordRequest {
+  id: string;
+  currentPassword: string;
+  newPassword: string;
+}
+
 export const USERS_PACKAGE_NAME = "users";
 
 export interface UsersServiceClient {
@@ -102,6 +113,10 @@ export interface UsersServiceClient {
   createOperator(request: CreateOperatorRequest): Observable<UserResponse>;
 
   revokeOperatorAccess(request: RevokeOperatorAccessRequest): Observable<UserResponse>;
+
+  updateProfile(request: UpdateProfileRequest): Observable<UserResponse>;
+
+  changePassword(request: ChangePasswordRequest): Observable<UserResponse>;
 }
 
 export interface UsersServiceController {
@@ -130,6 +145,10 @@ export interface UsersServiceController {
   revokeOperatorAccess(
     request: RevokeOperatorAccessRequest,
   ): Promise<UserResponse> | Observable<UserResponse> | UserResponse;
+
+  updateProfile(request: UpdateProfileRequest): Promise<UserResponse> | Observable<UserResponse> | UserResponse;
+
+  changePassword(request: ChangePasswordRequest): Promise<UserResponse> | Observable<UserResponse> | UserResponse;
 }
 
 export function UsersServiceControllerMethods() {
@@ -144,6 +163,8 @@ export function UsersServiceControllerMethods() {
       "listOperators",
       "createOperator",
       "revokeOperatorAccess",
+      "updateProfile",
+      "changePassword",
     ];
     for (const method of grpcMethods) {
       const descriptor: any = Reflect.getOwnPropertyDescriptor(constructor.prototype, method);

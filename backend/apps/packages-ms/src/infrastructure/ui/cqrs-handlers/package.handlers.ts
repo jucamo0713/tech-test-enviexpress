@@ -7,6 +7,7 @@ import {
 } from '../../../domain/models/cqrs/commands/package.commands';
 import {
   GetPackageByTrackingCodeQuery,
+  GetPackageStatusStatsQuery,
   GetPackageQuery,
   ListPackagesByClientQuery,
   ListPackagesQuery,
@@ -16,6 +17,7 @@ import {
   DeletePackageUseCase,
   GetPackageByTrackingCodeUseCase,
   GetPackageUseCase,
+  GetPackageStatusStatsUseCase,
   ListPackagesByClientUseCase,
   ListPackagesUseCase,
   UpdatePackageStatusUseCase,
@@ -85,4 +87,12 @@ export class GetPackageQueryHandler implements IQueryHandler<GetPackageQuery> {
 export class GetPackageByTrackingCodeQueryHandler implements IQueryHandler<GetPackageByTrackingCodeQuery> {
   constructor(private readonly useCase: GetPackageByTrackingCodeUseCase) {}
   execute(query: GetPackageByTrackingCodeQuery) { return this.useCase.execute(query.trackingCode); }
+}
+
+@QueryHandler(GetPackageStatusStatsQuery)
+export class GetPackageStatusStatsQueryHandler implements IQueryHandler<GetPackageStatusStatsQuery> {
+  constructor(private readonly useCase: GetPackageStatusStatsUseCase) {}
+  execute(query: GetPackageStatusStatsQuery) {
+    return this.useCase.execute(query.startDate, query.endDate);
+  }
 }

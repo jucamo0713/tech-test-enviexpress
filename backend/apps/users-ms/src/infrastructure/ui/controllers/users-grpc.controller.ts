@@ -4,7 +4,9 @@ import { CommandBus } from '@nestjs/cqrs';
 import { UsersProto } from 'app/shared';
 import { CreateClientUserCommand } from '../../../domain/models/cqrs/commands/create-client-user.command';
 import { CreateOperatorCommand } from '../../../domain/models/cqrs/commands/create-operator.command';
+import { ChangePasswordCommand } from '../../../domain/models/cqrs/commands/change-password.command';
 import { RevokeOperatorAccessCommand } from '../../../domain/models/cqrs/commands/revoke-operator-access.command';
+import { UpdateProfileCommand } from '../../../domain/models/cqrs/commands/update-profile.command';
 import { CountRegisteredClientsQuery } from '../../../domain/models/cqrs/queries/count-registered-clients.query';
 import { GetUserByEmailQuery } from '../../../domain/models/cqrs/queries/get-user-by-email.query';
 import { GetUserByIdQuery } from '../../../domain/models/cqrs/queries/get-user-by-id.query';
@@ -57,5 +59,13 @@ export class UsersGrpcController implements UsersProto.UsersServiceController {
 
   revokeOperatorAccess(request: UsersProto.RevokeOperatorAccessRequest) {
     return this.commandBus.execute(new RevokeOperatorAccessCommand(request.id));
+  }
+
+  updateProfile(request: UsersProto.UpdateProfileRequest) {
+    return this.commandBus.execute(new UpdateProfileCommand(request));
+  }
+
+  changePassword(request: UsersProto.ChangePasswordRequest) {
+    return this.commandBus.execute(new ChangePasswordCommand(request));
   }
 }

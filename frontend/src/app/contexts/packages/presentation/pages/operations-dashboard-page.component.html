@@ -6,8 +6,10 @@
     </div>
     <div class="session" *ngIf="user() as currentUser">
       <span>{{ currentUser.name }} · {{ currentUser.role }}</span>
+      <a *ngIf="isAdmin()" routerLink="/dashboard">Dashboard</a>
       <a *ngIf="isAdmin()" routerLink="/clients">Clientes</a>
       <a *ngIf="isAdmin()" routerLink="/operators">Operadores</a>
+      <a routerLink="/profile">Perfil</a>
       <button type="button" (click)="refresh()">Refresh</button>
       <button type="button" class="ghost" (click)="logout()">Cerrar sesion</button>
     </div>

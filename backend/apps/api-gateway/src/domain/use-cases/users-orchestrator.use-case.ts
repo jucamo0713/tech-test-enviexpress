@@ -1,6 +1,10 @@
 import { firstValueFrom } from 'rxjs';
 import { UsersProto } from 'app/shared';
 import { CreateOperatorRequest } from '../../infrastructure/dtos/users/operator.request';
+import {
+  ChangePasswordRequest,
+  UpdateProfileRequest,
+} from '../../infrastructure/dtos/users/profile.request';
 
 export class UsersOrchestratorUseCase {
   constructor(private readonly usersService: UsersProto.UsersServiceClient) {}
@@ -29,6 +33,32 @@ export class UsersOrchestratorUseCase {
   async revokeOperatorAccess(id: string) {
     const user = await firstValueFrom(
       this.usersService.revokeOperatorAccess({ id }),
+    );
+    return this.toPublicUser(user);
+  }
+
+  async getProfile(id: string) {
+    const user = await firstValueFrom(this.usersService.getUserById({ id }));
+    return this.toPublicUser(user);
+  }
+
+  async updateProfile(id: string, request: UpdateProfileRequest) {
+    const user = await firstValueFrom(
+      this.usersService.updateProfile({
+        id,
+        name: request.name,
+      }),
+    );
+    return this.toPublicUser(user);
+  }
+
+  async changePassword(id: string, request: ChangePasswordRequest) {
+    const user = await firstValueFrom(
+      this.usersService.changePassword({
+        id,
+        currentPassword: request.currentPassword,
+        newPassword: request.newPassword,
+      }),
     );
     return this.toPublicUser(user);
   }

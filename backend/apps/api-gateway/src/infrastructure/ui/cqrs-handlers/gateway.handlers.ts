@@ -3,13 +3,16 @@ import {
   GatewayCreateClientCommand,
   GatewayCreateOperatorCommand,
   GatewayCreatePackageCommand,
+  GatewayChangePasswordCommand,
   GatewayDeleteClientCommand,
   GatewayGetClientRegistrationStatsQuery,
   GatewayDeletePackageCommand,
   GatewayGetClientQuery,
   GatewayGetClientByEmailQuery,
   GatewayGetPackageQuery,
+  GatewayGetPackageStatusStatsQuery,
   GatewayGetPackageStatusQuery,
+  GatewayGetProfileQuery,
   GatewayGetPublicPackageStatusQuery,
   GatewayListClientsQuery,
   GatewayListClientPackagesQuery,
@@ -24,6 +27,7 @@ import {
   GatewayUpdateClientCommand,
   GatewayUpdatePackageCommand,
   GatewayUpdatePackageStatusCommand,
+  GatewayUpdateProfileCommand,
 } from '../../../domain/models/cqrs/gateway.messages';
 import { AuthOrchestratorUseCase } from '../../../domain/use-cases/auth-orchestrator.use-case';
 import { ClientsOrchestratorUseCase } from '../../../domain/use-cases/clients-orchestrator.use-case';
@@ -131,6 +135,36 @@ export class GatewayRevokeOperatorAccessCommandHandler
   }
 }
 
+@QueryHandler(GatewayGetProfileQuery)
+export class GatewayGetProfileQueryHandler
+  implements IQueryHandler<GatewayGetProfileQuery>
+{
+  constructor(private readonly useCase: UsersOrchestratorUseCase) {}
+  execute(query: GatewayGetProfileQuery) {
+    return this.useCase.getProfile(query.userId);
+  }
+}
+
+@CommandHandler(GatewayUpdateProfileCommand)
+export class GatewayUpdateProfileCommandHandler
+  implements ICommandHandler<GatewayUpdateProfileCommand>
+{
+  constructor(private readonly useCase: UsersOrchestratorUseCase) {}
+  execute(command: GatewayUpdateProfileCommand) {
+    return this.useCase.updateProfile(command.userId, command.payload as never);
+  }
+}
+
+@CommandHandler(GatewayChangePasswordCommand)
+export class GatewayChangePasswordCommandHandler
+  implements ICommandHandler<GatewayChangePasswordCommand>
+{
+  constructor(private readonly useCase: UsersOrchestratorUseCase) {}
+  execute(command: GatewayChangePasswordCommand) {
+    return this.useCase.changePassword(command.userId, command.payload as never);
+  }
+}
+
 @QueryHandler(GatewayListPackagesQuery)
 export class GatewayListPackagesQueryHandler implements IQueryHandler<GatewayListPackagesQuery> {
   constructor(private readonly useCase: PackagesOrchestratorUseCase) {}
@@ -143,6 +177,16 @@ export class GatewayListPackagesQueryHandler implements IQueryHandler<GatewayLis
       query.startDate,
       query.endDate,
     );
+  }
+}
+
+@QueryHandler(GatewayGetPackageStatusStatsQuery)
+export class GatewayGetPackageStatusStatsQueryHandler
+  implements IQueryHandler<GatewayGetPackageStatusStatsQuery>
+{
+  constructor(private readonly useCase: PackagesOrchestratorUseCase) {}
+  execute(query: GatewayGetPackageStatusStatsQuery) {
+    return this.useCase.getStatusStats(query.period, query.referenceDate);
   }
 }
 
@@ -242,9 +286,12 @@ export const GatewayClientQueryHandlers = [
 export const GatewayUserCommandHandlers = [
   GatewayCreateOperatorCommandHandler,
   GatewayRevokeOperatorAccessCommandHandler,
+  GatewayUpdateProfileCommandHandler,
+  GatewayChangePasswordCommandHandler,
 ];
 export const GatewayUserQueryHandlers = [
   GatewayListOperatorsQueryHandler,
+  GatewayGetProfileQueryHandler,
 ];
 export const GatewayPackageCommandHandlers = [
   GatewayCreatePackageCommandHandler,
@@ -254,6 +301,7 @@ export const GatewayPackageCommandHandlers = [
 ];
 export const GatewayPackageQueryHandlers = [
   GatewayListPackagesQueryHandler,
+  GatewayGetPackageStatusStatsQueryHandler,
   GatewayListClientPackagesQueryHandler,
   GatewayGetPackageQueryHandler,
   GatewayGetPackageStatusQueryHandler,

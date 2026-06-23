@@ -60,6 +60,15 @@ export class GatewayCreateOperatorCommand extends Command<unknown> {
 export class GatewayRevokeOperatorAccessCommand extends Command<unknown> {
   constructor(public readonly id: string) { super(); }
 }
+export class GatewayGetProfileQuery extends Query<unknown> {
+  constructor(public readonly userId: string) { super(); }
+}
+export class GatewayUpdateProfileCommand extends Command<unknown> {
+  constructor(public readonly userId: string, public readonly payload: unknown) { super(); }
+}
+export class GatewayChangePasswordCommand extends Command<unknown> {
+  constructor(public readonly userId: string, public readonly payload: unknown) { super(); }
+}
 
 export class GatewayListPackagesQuery extends Query<unknown> {
   constructor(
@@ -69,6 +78,11 @@ export class GatewayListPackagesQuery extends Query<unknown> {
     public readonly startDate?: string,
     public readonly endDate?: string,
   ) { super(); }
+}
+export class GatewayGetPackageStatusStatsQuery extends Query<unknown> {
+  constructor(public readonly period: string, public readonly referenceDate?: string) {
+    super();
+  }
 }
 export class GatewayListClientPackagesQuery extends Query<unknown> {
   constructor(

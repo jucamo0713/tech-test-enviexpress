@@ -18,6 +18,15 @@ export class AuthSessionService {
     localStorage.setItem(AUTH_USER_KEY, JSON.stringify(auth.user));
   }
 
+  updateUser(user: AuthUser): void {
+    const currentAuth = this.auth();
+    if (currentAuth) {
+      this.auth.set({ ...currentAuth, user });
+    }
+    this.user.set(user);
+    localStorage.setItem(AUTH_USER_KEY, JSON.stringify(user));
+  }
+
   clear(): void {
     this.auth.set(null);
     this.user.set(null);

@@ -19,6 +19,7 @@ import { PackagesOrchestratorUseCase } from '../domain/use-cases/packages-orches
 import { UsersOrchestratorUseCase } from '../domain/use-cases/users-orchestrator.use-case';
 import { AuthController } from '../infrastructure/ui/controllers/auth.controller';
 import { ClientsController } from '../infrastructure/ui/controllers/clients.controller';
+import { DashboardController } from '../infrastructure/ui/controllers/dashboard.controller';
 import { PackagesController } from '../infrastructure/ui/controllers/packages.controller';
 import { UsersController } from '../infrastructure/ui/controllers/users.controller';
 import { JwtAuthGuard } from '../infrastructure/guards/jwt-auth.guard';
@@ -43,7 +44,13 @@ const GatewayGrpcClients = {
 
 @Module({
   imports: [SharedModule, JwtModule.register({})],
-  controllers: [AuthController, ClientsController, PackagesController, UsersController],
+  controllers: [
+    AuthController,
+    ClientsController,
+    DashboardController,
+    PackagesController,
+    UsersController,
+  ],
   providers: [
     {
       provide: GatewayGrpcClients.AUTH,

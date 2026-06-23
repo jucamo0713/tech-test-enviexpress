@@ -1,0 +1,56 @@
+<main class="profile-page">
+  <section class="topbar">
+    <div>
+      <p class="eyebrow">Perfil</p>
+      <h1>Mi cuenta</h1>
+    </div>
+    <a [routerLink]="backRoute()">Volver</a>
+  </section>
+
+  <p class="empty" *ngIf="isLoading()">Cargando perfil...</p>
+  <p class="success" *ngIf="message()">{{ message() }}</p>
+  <p class="error" *ngIf="errorMessage()">{{ errorMessage() }}</p>
+
+  <section class="profile-grid" *ngIf="profile() as currentProfile">
+    <article class="summary">
+      <h2>{{ currentProfile.name }}</h2>
+      <p>{{ currentProfile.email }}</p>
+      <div class="chips">
+        <span>{{ currentProfile.role }}</span>
+        <span [class.revoked]="!currentProfile.active">
+          {{ currentProfile.active ? 'Activo' : 'Inactivo' }}
+        </span>
+      </div>
+    </article>
+
+    <form class="panel" [formGroup]="profileForm" (ngSubmit)="saveProfile()">
+      <h2>Datos personales</h2>
+      <label>
+        Nombre
+        <input type="text" formControlName="name" autocomplete="name" />
+      </label>
+      <div class="readonly-field">
+        <span>Correo</span>
+        <strong>{{ currentProfile.email }}</strong>
+      </div>
+      <button type="submit" [disabled]="isSavingProfile()">
+        {{ isSavingProfile() ? 'Guardando...' : 'Guardar cambios' }}
+      </button>
+    </form>
+
+    <form class="panel" [formGroup]="passwordForm" (ngSubmit)="changePassword()">
+      <h2>Cambiar contrasena</h2>
+      <label>
+        Contrasena actual
+        <input type="password" formControlName="currentPassword" autocomplete="current-password" />
+      </label>
+      <label>
+        Nueva contrasena
+        <input type="password" formControlName="newPassword" autocomplete="new-password" />
+      </label>
+      <button type="submit" [disabled]="isChangingPassword()">
+        {{ isChangingPassword() ? 'Actualizando...' : 'Cambiar contrasena' }}
+      </button>
+    </form>
+  </section>
+</main>

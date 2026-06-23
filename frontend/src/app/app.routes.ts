@@ -47,6 +47,14 @@ export const routes: Routes = [
       ).then((module) => module.OperationsDashboardPageComponent),
   },
   {
+    path: 'dashboard',
+    canActivate: [authGuard],
+    loadComponent: () =>
+      import(
+        './contexts/dashboard/presentation/pages/admin-dashboard-page.component'
+      ).then((module) => module.AdminDashboardPageComponent),
+  },
+  {
     path: 'clients',
     canActivate: [authGuard],
     loadComponent: () =>
@@ -61,6 +69,14 @@ export const routes: Routes = [
       import(
         './contexts/users/presentation/pages/operators-list-page.component'
       ).then((module) => module.OperatorsListPageComponent),
+  },
+  {
+    path: 'profile',
+    canActivate: [authGuard],
+    loadComponent: () =>
+      import('./contexts/users/presentation/pages/profile-page.component').then(
+        (module) => module.ProfilePageComponent,
+      ),
   },
   {
     path: '**',

@@ -7,6 +7,7 @@ import {
   CreatePackageUseCase,
   DeletePackageUseCase,
   GetPackageByTrackingCodeUseCase,
+  GetPackageStatusStatsUseCase,
   GetPackageUseCase,
   ListPackagesByClientUseCase,
   ListPackagesUseCase,
@@ -18,6 +19,7 @@ import {
   CreatePackageCommandHandler,
   DeletePackageCommandHandler,
   GetPackageByTrackingCodeQueryHandler,
+  GetPackageStatusStatsQueryHandler,
   GetPackageQueryHandler,
   ListPackagesByClientQueryHandler,
   ListPackagesQueryHandler,
@@ -48,6 +50,7 @@ const EnsureDefaultPackagesProvider = {
       ListPackagesByClientUseCase,
       GetPackageUseCase,
       GetPackageByTrackingCodeUseCase,
+      GetPackageStatusStatsUseCase,
       EnsureDefaultPackagesUseCase,
     ].map((useCase) => ({
       provide: useCase,
@@ -71,6 +74,7 @@ const EnsureDefaultPackagesProvider = {
     ListPackagesByClientQueryHandler,
     GetPackageQueryHandler,
     GetPackageByTrackingCodeQueryHandler,
+    GetPackageStatusStatsQueryHandler,
   ],
 })
 export class PackagesModule {}

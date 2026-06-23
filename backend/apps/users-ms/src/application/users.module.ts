@@ -17,9 +17,13 @@ import { CountRegisteredClientsQueryHandler } from '../infrastructure/ui/cqrs-ha
 import { ListOperatorsUseCase } from '../domain/use-cases/list-operators.use-case';
 import { CreateOperatorUseCase } from '../domain/use-cases/create-operator.use-case';
 import { RevokeOperatorAccessUseCase } from '../domain/use-cases/revoke-operator-access.use-case';
+import { UpdateProfileUseCase } from '../domain/use-cases/update-profile.use-case';
+import { ChangePasswordUseCase } from '../domain/use-cases/change-password.use-case';
 import { ListOperatorsQueryHandler } from '../infrastructure/ui/cqrs-handlers/list-operators.query-handler';
 import { CreateOperatorCommandHandler } from '../infrastructure/ui/cqrs-handlers/create-operator.command-handler';
 import { RevokeOperatorAccessCommandHandler } from '../infrastructure/ui/cqrs-handlers/revoke-operator-access.command-handler';
+import { UpdateProfileCommandHandler } from '../infrastructure/ui/cqrs-handlers/update-profile.command-handler';
+import { ChangePasswordCommandHandler } from '../infrastructure/ui/cqrs-handlers/change-password.command-handler';
 
 const EnsureDefaultAdminProvider = {
   provide: Symbol('ENSURE_DEFAULT_ADMIN_PROVIDER'),
@@ -89,10 +93,24 @@ const EnsureDefaultAdminProvider = {
       useFactory: (repository: UserRepository) =>
         new RevokeOperatorAccessUseCase(repository),
     },
+    {
+      provide: UpdateProfileUseCase,
+      inject: [UserRepository],
+      useFactory: (repository: UserRepository) =>
+        new UpdateProfileUseCase(repository),
+    },
+    {
+      provide: ChangePasswordUseCase,
+      inject: [UserRepository],
+      useFactory: (repository: UserRepository) =>
+        new ChangePasswordUseCase(repository),
+    },
     EnsureDefaultAdminProvider,
     CreateClientUserCommandHandler,
     CreateOperatorCommandHandler,
     RevokeOperatorAccessCommandHandler,
+    UpdateProfileCommandHandler,
+    ChangePasswordCommandHandler,
     GetUserByEmailQueryHandler,
     GetUserByIdQueryHandler,
     ListRegisteredClientIdsQueryHandler,

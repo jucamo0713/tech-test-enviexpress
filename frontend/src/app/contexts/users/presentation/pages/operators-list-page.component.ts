@@ -26,6 +26,7 @@ export class OperatorsListPageComponent implements OnInit {
   readonly isLoading = signal(false);
   readonly isCreating = signal(false);
   readonly errorMessage = signal('');
+  readonly operatorPendingRevoke = signal<OperatorUser | null>(null);
 
   readonly form = this.fb.nonNullable.group({
     name: ['', [Validators.required, Validators.minLength(2)]],
@@ -72,6 +73,16 @@ export class OperatorsListPageComponent implements OnInit {
   }
 
   revokeAccess(operator: OperatorUser): void {
+    this.operatorPendingRevoke.set(operator);
+  }
+
+  cancelRevoke(): void {
+    this.operatorPendingRevoke.set(null);
+  }
+
+  confirmRevoke(): void {
+    const operator = this.operatorPendingRevoke();
+    if (!operator) return;
     if (!operator.active) return;
 
     this.operatorsApi.revokeAccess(operator.id).subscribe({
@@ -79,6 +90,7 @@ export class OperatorsListPageComponent implements OnInit {
         this.operators.update((operators) =>
           operators.map((item) => item.id === updated.id ? updated : item),
         );
+        this.cancelRevoke();
       },
       error: () => this.errorMessage.set('No se pudo revocar el acceso'),
     });

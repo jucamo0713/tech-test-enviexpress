@@ -188,6 +188,16 @@ export class PackagesOrchestratorUseCase {
     await this.audit('package', id, 'deleted', userId ?? 'system', {});
   }
 
+  async getStatusStats(period: string, referenceDate?: string) {
+    const range = this.resolveStatsRange(period, referenceDate);
+    return firstValueFrom(
+      this.packagesService.getStatusStats({
+        startDate: range.startDate,
+        endDate: range.endDate,
+      }),
+    );
+  }
+
   private async audit(
     entityType: string,
     entityId: string,
@@ -280,6 +290,44 @@ export class PackagesOrchestratorUseCase {
         ...history,
         changedBy: nameByUserId.get(history.changedBy) ?? history.changedBy,
       })),
+    };
+  }
+
+  private resolveStatsRange(period: string, referenceDate?: string) {
+    const normalizedPeriod = ['day', 'week', 'month', 'year'].includes(period)
+      ? period
+      : 'day';
+    const reference = referenceDate ? new Date(referenceDate) : new Date();
+    if (Number.isNaN(reference.getTime())) reference.setTime(Date.now());
+
+    const start = new Date(reference);
+    const end = new Date(reference);
+    start.setHours(0, 0, 0, 0);
+    end.setHours(23, 59, 59, 999);
+
+    if (normalizedPeriod === 'week') {
+      const day = start.getDay() || 7;
+      start.setDate(start.getDate() - day + 1);
+      end.setTime(start.getTime());
+      end.setDate(start.getDate() + 6);
+      end.setHours(23, 59, 59, 999);
+    }
+
+    if (normalizedPeriod === 'month') {
+      start.setDate(1);
+      end.setMonth(start.getMonth() + 1, 0);
+      end.setHours(23, 59, 59, 999);
+    }
+
+    if (normalizedPeriod === 'year') {
+      start.setMonth(0, 1);
+      end.setMonth(11, 31);
+      end.setHours(23, 59, 59, 999);
+    }
+
+    return {
+      startDate: start.toISOString(),
+      endDate: end.toISOString(),
     };
   }
 }

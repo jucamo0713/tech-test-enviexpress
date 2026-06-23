@@ -31,3 +31,9 @@ export class GetPackageQuery extends Query<Package> {
 export class GetPackageByTrackingCodeQuery extends Query<Package> {
   constructor(public readonly trackingCode: string) { super(); }
 }
+
+export class GetPackageStatusStatsQuery extends Query<unknown> {
+  constructor(public readonly startDate: string, public readonly endDate: string) {
+    super();
+  }
+}

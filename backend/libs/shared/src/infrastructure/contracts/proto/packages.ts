@@ -98,6 +98,23 @@ export interface ListPackagesResponse {
   totalPages: number;
 }
 
+export interface PackageStatusStatsRequest {
+  startDate: string;
+  endDate: string;
+}
+
+export interface PackageStatusStatItem {
+  status: string;
+  total: number;
+}
+
+export interface PackageStatusStatsResponse {
+  items: PackageStatusStatItem[];
+  total: number;
+  startDate: string;
+  endDate: string;
+}
+
 export const PACKAGES_PACKAGE_NAME = "packages";
 
 export interface PackagesServiceClient {
@@ -118,6 +135,8 @@ export interface PackagesServiceClient {
   updatePackageStatus(request: UpdatePackageStatusRequest): Observable<PackageResponse>;
 
   deletePackage(request: DeletePackageRequest): Observable<DeletePackageResponse>;
+
+  getStatusStats(request: PackageStatusStatsRequest): Observable<PackageStatusStatsResponse>;
 }
 
 export interface PackagesServiceController {
@@ -152,6 +171,10 @@ export interface PackagesServiceController {
   deletePackage(
     request: DeletePackageRequest,
   ): Promise<DeletePackageResponse> | Observable<DeletePackageResponse> | DeletePackageResponse;
+
+  getStatusStats(
+    request: PackageStatusStatsRequest,
+  ): Promise<PackageStatusStatsResponse> | Observable<PackageStatusStatsResponse> | PackageStatusStatsResponse;
 }
 
 export function PackagesServiceControllerMethods() {
@@ -166,6 +189,7 @@ export function PackagesServiceControllerMethods() {
       "updatePackage",
       "updatePackageStatus",
       "deletePackage",
+      "getStatusStats",
     ];
     for (const method of grpcMethods) {
       const descriptor: any = Reflect.getOwnPropertyDescriptor(constructor.prototype, method);

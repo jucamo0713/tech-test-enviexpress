@@ -4,7 +4,10 @@
       <p class="eyebrow">Usuarios</p>
       <h1>Operadores</h1>
     </div>
-    <a routerLink="/operations">Volver a paquetes</a>
+    <div class="top-actions">
+      <a routerLink="/profile">Perfil</a>
+      <a routerLink="/operations">Volver a paquetes</a>
+    </div>
   </section>
 
   <p class="error" *ngIf="errorMessage()">{{ errorMessage() }}</p>
@@ -66,4 +69,17 @@
       Siguiente
     </button>
   </nav>
+
+  <div class="modal-backdrop" *ngIf="operatorPendingRevoke() as operator">
+    <section class="confirm-modal" role="dialog" aria-modal="true" aria-labelledby="revoke-operator-title">
+      <h2 id="revoke-operator-title">Revocar acceso</h2>
+      <p>
+        Se revocara el acceso de {{ operator.name }}. Este usuario no podra iniciar sesion ni seguir usando tokens activos.
+      </p>
+      <div class="modal-actions">
+        <button type="button" class="secondary" (click)="cancelRevoke()">Cancelar</button>
+        <button type="button" class="danger" (click)="confirmRevoke()">Revocar acceso</button>
+      </div>
+    </section>
+  </div>
 </main>

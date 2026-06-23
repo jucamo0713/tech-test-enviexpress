@@ -10,6 +10,7 @@ import {
 } from '../../../domain/models/cqrs/commands/package.commands';
 import {
   GetPackageQuery,
+  GetPackageStatusStatsQuery,
   GetPackageByTrackingCodeQuery,
   ListPackagesByClientQuery,
   ListPackagesQuery,
@@ -88,6 +89,14 @@ export class PackagesGrpcController
 
   deletePackage(request: PackagesProto.DeletePackageRequest) {
     return this.commandBus.execute(new DeletePackageCommand(request.id));
+  }
+
+  getStatusStats(
+    request: PackagesProto.PackageStatusStatsRequest,
+  ): Promise<PackagesProto.PackageStatusStatsResponse> {
+    return this.queryBus.execute(
+      new GetPackageStatusStatsQuery(request.startDate, request.endDate),
+    ) as Promise<PackagesProto.PackageStatusStatsResponse>;
   }
 
   private normalizePage(page?: number): number {

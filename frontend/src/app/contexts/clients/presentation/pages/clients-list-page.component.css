@@ -27,6 +27,12 @@ p {
   margin: 0;
 }
 
+.top-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
 .topbar a {
   background: #334155;
   border-radius: 6px;
@@ -184,6 +190,10 @@ p {
 
   .topbar {
     flex-direction: column;
+  }
+
+  .top-actions {
+    width: 100%;
   }
 
   .chips {

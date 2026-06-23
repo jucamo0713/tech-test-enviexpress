@@ -1,0 +1,68 @@
+<main class="dashboard-page">
+  <section class="topbar">
+    <div>
+      <p class="eyebrow">Dashboard</p>
+      <h1>Rendimiento operativo</h1>
+    </div>
+    <div class="top-actions">
+      <a routerLink="/profile">Perfil</a>
+      <a routerLink="/operations">Paquetes</a>
+    </div>
+  </section>
+
+  <form class="filters" [formGroup]="form" (ngSubmit)="loadStats()">
+    <div class="periods">
+      <button
+        type="button"
+        *ngFor="let period of periods"
+        [class.active]="form.controls.period.value === period"
+        (click)="form.controls.period.setValue(period); loadStats()"
+      >
+        {{ period }}
+      </button>
+    </div>
+    <input type="date" formControlName="date" />
+    <button type="submit">Aplicar</button>
+  </form>
+
+  <p class="error" *ngIf="errorMessage()">{{ errorMessage() }}</p>
+  <p class="empty" *ngIf="isLoading()">Cargando dashboard...</p>
+
+  <section class="stats-grid" *ngIf="stats() as currentStats">
+    <article class="summary-card">
+      <span>Total transiciones</span>
+      <strong>{{ currentStats.total }}</strong>
+      <small>
+        {{ formatDate(currentStats.startDate) }} - {{ formatDate(currentStats.endDate) }}
+      </small>
+    </article>
+
+    <article class="chart-panel">
+      <h2>Paquetes por estado</h2>
+      <div class="chart-layout">
+        <div class="pie-wrap">
+          <svg viewBox="0 0 100 100" role="img" aria-label="Grafico de estados">
+            <circle cx="50" cy="50" r="38" fill="#e2e8f0" *ngIf="!currentStats.total" />
+            <path
+              *ngFor="let slice of slices()"
+              [attr.d]="slice.path"
+              [attr.fill]="slice.color"
+            />
+            <circle cx="50" cy="50" r="20" fill="white" />
+            <text x="50" y="48" text-anchor="middle">{{ currentStats.total }}</text>
+            <text x="50" y="58" text-anchor="middle">total</text>
+          </svg>
+        </div>
+
+        <div class="legend">
+          <div class="legend-row" *ngFor="let item of currentStats.items">
+            <span class="swatch" [style.background]="colorFor(item.status)"></span>
+            <strong>{{ item.status }}</strong>
+            <em>{{ item.total }}</em>
+            <small>{{ percentageFor(item) }}%</small>
+          </div>
+        </div>
+      </div>
+    </article>
+  </section>
+</main>

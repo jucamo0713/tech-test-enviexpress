@@ -4,7 +4,10 @@
       <p class="eyebrow">Clientes</p>
       <h1>Listado de clientes</h1>
     </div>
-    <a routerLink="/operations">Volver a paquetes</a>
+    <div class="top-actions">
+      <a routerLink="/profile">Perfil</a>
+      <a routerLink="/operations">Volver a paquetes</a>
+    </div>
   </section>
 
   <p class="error" *ngIf="errorMessage()">{{ errorMessage() }}</p>

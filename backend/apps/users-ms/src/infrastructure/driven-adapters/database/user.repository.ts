@@ -114,6 +114,35 @@ export class UserRepository {
     return this.toDomain(user);
   }
 
+  async updateProfile(input: {
+    id: string;
+    name: string;
+  }): Promise<User> {
+    const user = await this.userModel
+      .findOneAndUpdate(
+        { id: input.id },
+        { $set: { name: input.name } },
+        { new: true },
+      )
+      .lean();
+
+    if (!user) throw new NotFoundException('User not found');
+    return this.toDomain(user);
+  }
+
+  async updatePassword(id: string, passwordHash: string): Promise<User> {
+    const user = await this.userModel
+      .findOneAndUpdate(
+        { id },
+        { $set: { passwordHash } },
+        { new: true },
+      )
+      .lean();
+
+    if (!user) throw new NotFoundException('User not found');
+    return this.toDomain(user);
+  }
+
   private toDomain(user: UserDocument): User {
     return {
       id: user.id,

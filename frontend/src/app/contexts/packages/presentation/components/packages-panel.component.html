@@ -67,4 +67,17 @@
       </div>
     </div>
   </div>
+
+  <div class="modal-backdrop" *ngIf="packagePendingDelete() as packageItem">
+    <section class="confirm-modal" role="dialog" aria-modal="true" aria-labelledby="delete-package-title">
+      <h3 id="delete-package-title">Eliminar paquete</h3>
+      <p>
+        Se eliminara el paquete {{ packageItem.trackingCode }}. Esta accion no se puede deshacer.
+      </p>
+      <div class="modal-actions">
+        <button type="button" class="ghost" (click)="cancelDelete()">Cancelar</button>
+        <button type="button" class="danger" (click)="confirmDelete()">Eliminar</button>
+      </div>
+    </section>
+  </div>
 </article>

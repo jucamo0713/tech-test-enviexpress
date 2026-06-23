@@ -45,6 +45,7 @@ export class PackagesPanelComponent {
   readonly clientLookupCompleted = signal(false);
   readonly lookupMessage = signal('');
   readonly editingPackage = signal<PackageItem | null>(null);
+  readonly packagePendingDelete = signal<PackageItem | null>(null);
 
   readonly form = this.fb.nonNullable.group({
     clientEmail: ['', [Validators.required, Validators.email]],
@@ -155,7 +156,19 @@ export class PackagesPanelComponent {
   }
 
   requestDelete(packageItem: PackageItem): void {
+    this.packagePendingDelete.set(packageItem);
+  }
+
+  cancelDelete(): void {
+    this.packagePendingDelete.set(null);
+  }
+
+  confirmDelete(): void {
+    const packageItem = this.packagePendingDelete();
+    if (!packageItem) return;
+
     this.deletePackage.emit(packageItem.id);
+    this.cancelDelete();
   }
 
   canSubmit(): boolean {

@@ -136,3 +136,18 @@ export class DeletePackageUseCase {
     return { deleted: true };
   }
 }
+
+export class GetPackageStatusStatsUseCase {
+  constructor(private readonly repository: PackageRepository) {}
+
+  async execute(startDate: string, endDate: string) {
+    const items = await this.repository.getStatusStats({ startDate, endDate });
+
+    return {
+      items,
+      total: items.reduce((total, item) => total + item.total, 0),
+      startDate,
+      endDate,
+    };
+  }
+}

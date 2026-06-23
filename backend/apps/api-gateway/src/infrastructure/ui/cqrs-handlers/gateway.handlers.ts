@@ -18,6 +18,7 @@ import {
   GatewayListClientPackagesQuery,
   GatewayListPackagesQuery,
   GatewayListOperatorsQuery,
+  GatewayListOperatorHistoryQuery,
   GatewayLoginCommand,
   GatewayRefreshTokenCommand,
   GatewayRegisterClientCommand,
@@ -187,6 +188,14 @@ export class GatewayGetPackageStatusStatsQueryHandler
   constructor(private readonly useCase: PackagesOrchestratorUseCase) {}
   execute(query: GatewayGetPackageStatusStatsQuery) {
     return this.useCase.getStatusStats(query.period, query.referenceDate);
+  }
+}
+
+@QueryHandler(GatewayListOperatorHistoryQuery)
+export class GatewayListOperatorHistoryQueryHandler implements IQueryHandler<GatewayListOperatorHistoryQuery> {
+  constructor(private readonly useCase: PackagesOrchestratorUseCase) {}
+  execute(query: GatewayListOperatorHistoryQuery) {
+    return this.useCase.listOperatorHistory(query.operatorId, query.page, query.limit);
   }
 }
 

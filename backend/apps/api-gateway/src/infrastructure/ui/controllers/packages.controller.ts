@@ -34,6 +34,7 @@ import {
   GatewayGetPublicPackageStatusQuery,
   GatewayListClientPackagesQuery,
   GatewayListPackagesQuery,
+  GatewayListOperatorHistoryQuery,
   GatewayTrackPackageStatusByIdQuery,
   GatewayTrackPackageStatusQuery,
   GatewayUpdatePackageCommand,
@@ -76,6 +77,22 @@ export class PackagesController {
         status,
         startDate,
         endDate,
+      ),
+    );
+  }
+
+  @Get('operators/:id/history')
+  @Roles('admin')
+  async listOperatorHistory(
+    @Param('id') id: string,
+    @Query('page') page?: string,
+    @Query('limit') limit?: string,
+  ) {
+    return this.queryBus.execute(
+      new GatewayListOperatorHistoryQuery(
+        id,
+        this.normalizePage(page),
+        this.normalizeLimit(limit),
       ),
     );
   }

@@ -13,6 +13,8 @@ export interface PackageItem {
   destinationAddress: string;
   status: string;
   history: PackageHistoryItem[];
+  createdAt: string;
+  updatedAt: string;
 }
 
 export interface PaginatedPackages {

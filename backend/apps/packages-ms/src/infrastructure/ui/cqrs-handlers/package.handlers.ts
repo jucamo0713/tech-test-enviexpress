@@ -11,6 +11,7 @@ import {
   GetPackageQuery,
   ListPackagesByClientQuery,
   ListPackagesQuery,
+  ListOperatorHistoryQuery,
 } from '../../../domain/models/cqrs/queries/package.queries';
 import {
   CreatePackageUseCase,
@@ -22,6 +23,7 @@ import {
   ListPackagesUseCase,
   UpdatePackageStatusUseCase,
   UpdatePackageUseCase,
+  ListOperatorHistoryUseCase,
 } from '../../../domain/use-cases/package.use-cases';
 
 @CommandHandler(CreatePackageCommand)
@@ -94,5 +96,13 @@ export class GetPackageStatusStatsQueryHandler implements IQueryHandler<GetPacka
   constructor(private readonly useCase: GetPackageStatusStatsUseCase) {}
   execute(query: GetPackageStatusStatsQuery) {
     return this.useCase.execute(query.startDate, query.endDate);
+  }
+}
+
+@QueryHandler(ListOperatorHistoryQuery)
+export class ListOperatorHistoryQueryHandler implements IQueryHandler<ListOperatorHistoryQuery> {
+  constructor(private readonly useCase: ListOperatorHistoryUseCase) {}
+  execute(query: ListOperatorHistoryQuery) {
+    return this.useCase.execute(query.operatorId, query.page, query.limit);
   }
 }

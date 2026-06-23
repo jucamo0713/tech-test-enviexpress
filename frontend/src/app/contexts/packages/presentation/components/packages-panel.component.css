@@ -106,6 +106,28 @@ button:disabled {
   min-height: auto;
   padding: 0;
   text-align: left;
+  width: 100%;
+}
+
+.row-header {
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+  align-items: center;
+}
+
+.date {
+  font-size: 11px;
+  color: #64748b;
+}
+
+.description {
+  font-size: 14px;
+}
+
+.address {
+  font-size: 13px;
+  color: #475569;
 }
 
 .row-main em {

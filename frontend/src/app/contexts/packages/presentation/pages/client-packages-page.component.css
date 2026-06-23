@@ -114,6 +114,12 @@ p {
   justify-content: space-between;
 }
 
+.package-date {
+  font-size: 11px;
+  color: #64748b;
+  display: block;
+}
+
 .icon-btn {
   background: transparent;
   border: 0;

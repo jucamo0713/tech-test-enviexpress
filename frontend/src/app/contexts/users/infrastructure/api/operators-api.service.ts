@@ -32,4 +32,16 @@ export class OperatorsApiService {
       {},
     );
   }
+
+  getById(id: string): Observable<OperatorUser> {
+    return this.http.get<OperatorUser>(
+      `${this.config.apiBaseUrl}/users/operators/${id}`,
+    );
+  }
+
+  getHistory(id: string, page = 1, limit = 10): Observable<any> {
+    return this.http.get<any>(
+      `${this.config.apiBaseUrl}/packages/operators/${id}/history?page=${page}&limit=${limit}`,
+    );
+  }
 }

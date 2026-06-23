@@ -157,3 +157,21 @@ export class GetPackageStatusStatsUseCase {
     };
   }
 }
+
+export class ListOperatorHistoryUseCase {
+  constructor(private readonly repository: PackageRepository) {}
+  async execute(operatorId: string, page: number, limit: number) {
+    const result = await this.repository.listOperatorHistoryPaginated({
+      operatorId,
+      page,
+      limit,
+    });
+    return {
+      items: result.items,
+      page,
+      limit,
+      total: result.total,
+      totalPages: Math.ceil(result.total / limit),
+    };
+  }
+}

@@ -71,6 +71,14 @@ export const routes: Routes = [
       ).then((module) => module.OperatorsListPageComponent),
   },
   {
+    path: 'operators/:id',
+    canActivate: [authGuard],
+    loadComponent: () =>
+      import(
+        './contexts/users/presentation/pages/operator-detail-page.component'
+      ).then((module) => module.OperatorDetailPageComponent),
+  },
+  {
     path: 'profile',
     canActivate: [authGuard],
     loadComponent: () =>

@@ -85,6 +85,12 @@ export class UsersController {
     return this.commandBus.execute(new GatewayRevokeOperatorAccessCommand(id));
   }
 
+  @Get('operators/:id')
+  @Roles('admin')
+  getById(@Param('id') id: string) {
+    return this.queryBus.execute(new GatewayGetProfileQuery(id));
+  }
+
   private normalizePage(page?: string): number {
     return Math.max(Number(page || 1), 1);
   }

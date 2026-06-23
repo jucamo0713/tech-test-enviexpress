@@ -84,6 +84,15 @@ export class GatewayGetPackageStatusStatsQuery extends Query<unknown> {
     super();
   }
 }
+export class GatewayListOperatorHistoryQuery extends Query<unknown> {
+  constructor(
+    public readonly operatorId: string,
+    public readonly page: number,
+    public readonly limit: number,
+  ) {
+    super();
+  }
+}
 export class GatewayListClientPackagesQuery extends Query<unknown> {
   constructor(
     public readonly clientId: string,

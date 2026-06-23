@@ -59,13 +59,17 @@
   <div class="list">
     <div class="row" *ngFor="let packageItem of packages">
       <button type="button" class="row-main" (click)="selectPackage.emit(packageItem)">
-        <strong>
-          {{ packageItem.trackingCode }}
-          <span class="copy-icon" (click)="copyToClipboard(packageItem.trackingCode); $event.stopPropagation()" title="Copiar guía">
-            📋
-          </span>
-        </strong>
-        <span>{{ packageItem.description }}</span>
+        <div class="row-header">
+          <strong>
+            {{ packageItem.trackingCode }}
+            <span class="copy-icon" (click)="copyToClipboard(packageItem.trackingCode); $event.stopPropagation()" title="Copiar guía">
+              {{ copiedCode() === packageItem.trackingCode ? '✅' : '📋' }}
+            </span>
+          </strong>
+          <span class="date">{{ packageItem.createdAt | date:'short' }}</span>
+        </div>
+        <span class="description">{{ packageItem.description }}</span>
+        <span class="address">{{ packageItem.destinationAddress }}</span>
         <em>{{ statusNames[packageItem.status] || packageItem.status }}</em>
       </button>
       <div class="row-actions" *ngIf="isAdmin">

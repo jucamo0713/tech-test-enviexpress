@@ -1,0 +1,67 @@
+<app-navbar />
+<main class="operator-detail-page">
+  <section class="topbar">
+    <div *ngIf="operator() as op">
+      <p class="eyebrow">
+        <a routerLink="/operators">Operadores</a> / Detalles
+      </p>
+      <h1>{{ op.name }}</h1>
+      <p class="email">{{ op.email }}</p>
+    </div>
+    <div *ngIf="isLoading()">
+      <h1>Cargando...</h1>
+    </div>
+  </section>
+
+  <p class="error" *ngIf="errorMessage()">{{ errorMessage() }}</p>
+
+  <section class="history-section" *ngIf="!isLoading()">
+    <header>
+      <h2>Historial de operaciones</h2>
+      <p class="total">Total: {{ total() }} operaciones</p>
+    </header>
+
+    <div class="table-container">
+      <table class="history-table">
+        <thead>
+          <tr>
+            <th>Fecha</th>
+            <th>Guía</th>
+            <th>Acción / Estado</th>
+            <th>Comentario</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let item of history()">
+            <td>{{ formatDateTime(item.changedAt) }}</td>
+            <td>
+              <span class="tracking-code">{{ item.trackingCode }}</span>
+            </td>
+            <td>
+              <span class="status-badge" [attr.data-status]="item.status">
+                {{ statusNames[item.status] || item.status }}
+              </span>
+            </td>
+            <td class="comment">{{ item.comment || '-' }}</td>
+          </tr>
+          <tr *ngIf="history().length === 0 && !isLoadingHistory()">
+            <td colspan="4" class="empty">No se han registrado operaciones para este operador.</td>
+          </tr>
+          <tr *ngIf="isLoadingHistory()">
+            <td colspan="4" class="loading">Actualizando historial...</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <nav class="pagination" *ngIf="total() > limit()">
+      <button type="button" (click)='previousPage()' [disabled]="page() <= 1">
+        Anterior
+      </button>
+      <span>Página {{ page() }} de {{ totalPages() }}</span>
+      <button type="button" (click)="nextPage()" [disabled]="page() >= totalPages()">
+        Siguiente
+      </button>
+    </nav>
+  </section>
+</main>

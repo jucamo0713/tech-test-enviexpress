@@ -37,3 +37,13 @@ export class GetPackageStatusStatsQuery extends Query<unknown> {
     super();
   }
 }
+
+export class ListOperatorHistoryQuery extends Query<unknown> {
+  constructor(
+    public readonly operatorId: string,
+    public readonly page: number,
+    public readonly limit: number,
+  ) {
+    super();
+  }
+}

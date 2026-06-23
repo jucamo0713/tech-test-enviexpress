@@ -49,6 +49,7 @@ export class PackagesPanelComponent {
   readonly lookupMessage = signal('');
   readonly editingPackage = signal<PackageItem | null>(null);
   readonly packagePendingDelete = signal<PackageItem | null>(null);
+  readonly copiedCode = signal('');
 
   readonly form = this.fb.nonNullable.group({
     clientEmail: ['', [Validators.required, Validators.email]],
@@ -213,6 +214,12 @@ export class PackagesPanelComponent {
 
   copyToClipboard(text: string): void {
     void navigator.clipboard.writeText(text);
+    this.copiedCode.set(text);
+    setTimeout(() => {
+      if (this.copiedCode() === text) {
+        this.copiedCode.set('');
+      }
+    }, 2000);
   }
 
   private normalizedFilters(): PackageListFilters {

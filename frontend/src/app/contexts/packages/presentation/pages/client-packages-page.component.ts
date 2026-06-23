@@ -29,6 +29,7 @@ export class ClientPackagesPageComponent implements OnInit {
   readonly isLoading = signal(false);
   readonly hasLoaded = signal(false);
   readonly filters = signal<PackageListFilters>({});
+  readonly copiedCode = signal('');
   readonly statusNames = PACKAGE_STATUS_NAMES;
   readonly statusOptions = [
     'created',
@@ -82,6 +83,12 @@ export class ClientPackagesPageComponent implements OnInit {
 
   copyToClipboard(text: string): void {
     void navigator.clipboard.writeText(text);
+    this.copiedCode.set(text);
+    setTimeout(() => {
+      if (this.copiedCode() === text) {
+        this.copiedCode.set('');
+      }
+    }, 2000);
   }
 
   private loadPackages(): void {

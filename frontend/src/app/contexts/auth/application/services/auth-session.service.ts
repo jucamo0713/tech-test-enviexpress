@@ -36,16 +36,7 @@ export class AuthSessionService {
   }
 
   accessToken(): string | null {
-    const token = this.auth()?.accessToken ?? localStorage.getItem(ACCESS_TOKEN_KEY);
-
-    if (!token) return null;
-
-    if (this.isJwtExpired(token)) {
-      this.clear();
-      return null;
-    }
-
-    return token;
+    return this.auth()?.accessToken ?? localStorage.getItem(ACCESS_TOKEN_KEY);
   }
 
   refreshToken(): string | null {
@@ -53,11 +44,22 @@ export class AuthSessionService {
   }
 
   hasSession(): boolean {
-    return !!this.accessToken();
+    return !!this.refreshToken() && !this.isRefreshTokenExpired();
   }
 
   isAccessTokenExpired(): boolean {
-    const token = this.auth()?.accessToken ?? localStorage.getItem(ACCESS_TOKEN_KEY);
+    const token = this.accessToken();
+    return !token || this.isJwtExpired(token);
+  }
+
+  isAccessTokenAboutToExpire(bufferSeconds: number = 3 * 60): boolean {
+    const token = this.accessToken();
+    if (!token) return false;
+    return this.isJwtExpired(token, bufferSeconds);
+  }
+
+  isRefreshTokenExpired(): boolean {
+    const token = this.refreshToken();
     return !token || this.isJwtExpired(token);
   }
 
@@ -73,11 +75,11 @@ export class AuthSessionService {
     }
   }
 
-  private isJwtExpired(token: string): boolean {
+  private isJwtExpired(token: string, bufferSeconds: number = 0): boolean {
     const payload = this.decodeJwtPayload(token);
     if (!payload?.exp) return true;
 
-    const expiresAt = payload.exp * 1000;
+    const expiresAt = (payload.exp - bufferSeconds) * 1000;
     return Date.now() >= expiresAt;
   }
 

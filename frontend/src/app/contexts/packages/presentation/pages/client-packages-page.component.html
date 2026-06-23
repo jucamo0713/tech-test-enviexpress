@@ -40,10 +40,11 @@
           <p class="tracking">
             {{ item.trackingCode }}
             <button type="button" class="icon-btn" (click)="copyToClipboard(item.trackingCode)" title="Copiar guía">
-              📋
+              {{ copiedCode() === item.trackingCode ? '✅' : '📋' }}
             </button>
           </p>
           <h2>{{ statusNames[item.status] || item.status }}</h2>
+          <span class="package-date">{{ item.createdAt | date:'short' }}</span>
         </div>
         <a [routerLink]="['/track']" [queryParams]="{ trackingCode: item.trackingCode, email: user()?.email }" class="track-link">
           Ver rastreo

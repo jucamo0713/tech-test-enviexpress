@@ -115,6 +115,28 @@ export interface PackageStatusStatsResponse {
   endDate: string;
 }
 
+export interface ListOperatorHistoryRequest {
+  operatorId: string;
+  page: number;
+  limit: number;
+}
+
+export interface OperatorHistoryItem {
+  packageId: string;
+  trackingCode: string;
+  status: string;
+  comment?: string | undefined;
+  changedAt: string;
+}
+
+export interface ListOperatorHistoryResponse {
+  items: OperatorHistoryItem[];
+  page: number;
+  limit: number;
+  total: number;
+  totalPages: number;
+}
+
 export const PACKAGES_PACKAGE_NAME = "packages";
 
 export interface PackagesServiceClient {
@@ -137,6 +159,8 @@ export interface PackagesServiceClient {
   deletePackage(request: DeletePackageRequest): Observable<DeletePackageResponse>;
 
   getStatusStats(request: PackageStatusStatsRequest): Observable<PackageStatusStatsResponse>;
+
+  listOperatorHistory(request: ListOperatorHistoryRequest): Observable<ListOperatorHistoryResponse>;
 }
 
 export interface PackagesServiceController {
@@ -175,6 +199,10 @@ export interface PackagesServiceController {
   getStatusStats(
     request: PackageStatusStatsRequest,
   ): Promise<PackageStatusStatsResponse> | Observable<PackageStatusStatsResponse> | PackageStatusStatsResponse;
+
+  listOperatorHistory(
+    request: ListOperatorHistoryRequest,
+  ): Promise<ListOperatorHistoryResponse> | Observable<ListOperatorHistoryResponse> | ListOperatorHistoryResponse;
 }
 
 export function PackagesServiceControllerMethods() {
@@ -190,6 +218,7 @@ export function PackagesServiceControllerMethods() {
       "updatePackageStatus",
       "deletePackage",
       "getStatusStats",
+      "listOperatorHistory",
     ];
     for (const method of grpcMethods) {
       const descriptor: any = Reflect.getOwnPropertyDescriptor(constructor.prototype, method);

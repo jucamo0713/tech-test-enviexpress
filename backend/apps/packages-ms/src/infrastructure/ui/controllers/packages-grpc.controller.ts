@@ -14,6 +14,7 @@ import {
   GetPackageByTrackingCodeQuery,
   ListPackagesByClientQuery,
   ListPackagesQuery,
+  ListOperatorHistoryQuery,
 } from '../../../domain/models/cqrs/queries/package.queries';
 
 @Controller()
@@ -97,6 +98,18 @@ export class PackagesGrpcController
     return this.queryBus.execute(
       new GetPackageStatusStatsQuery(request.startDate, request.endDate),
     ) as Promise<PackagesProto.PackageStatusStatsResponse>;
+  }
+
+  async listOperatorHistory(
+    request: PackagesProto.ListOperatorHistoryRequest,
+  ): Promise<PackagesProto.ListOperatorHistoryResponse> {
+    return this.queryBus.execute(
+      new ListOperatorHistoryQuery(
+        request.operatorId,
+        this.normalizePage(request.page),
+        this.normalizeLimit(request.limit),
+      ),
+    ) as Promise<PackagesProto.ListOperatorHistoryResponse>;
   }
 
   private normalizePage(page?: number): number {

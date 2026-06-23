@@ -116,8 +116,27 @@ button:disabled {
   border-radius: 8px;
   display: grid;
   gap: 12px;
-  grid-template-columns: minmax(0, 1fr) auto minmax(150px, 0.5fr) auto;
+  grid-template-columns: minmax(0, 1fr) auto minmax(150px, 0.3fr) auto;
   padding: 16px;
+}
+
+.actions {
+  display: flex;
+  gap: 8px;
+}
+
+.button {
+  align-items: center;
+  border: 0;
+  border-radius: 6px;
+  cursor: pointer;
+  display: inline-flex;
+  font: inherit;
+  font-weight: 700;
+  justify-content: center;
+  min-height: 40px;
+  padding: 8px 12px;
+  text-decoration: none;
 }
 
 .operator-card p {

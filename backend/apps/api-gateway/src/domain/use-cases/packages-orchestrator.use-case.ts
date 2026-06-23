@@ -198,6 +198,12 @@ export class PackagesOrchestratorUseCase {
     );
   }
 
+  async listOperatorHistory(operatorId: string, page: number, limit: number) {
+    return firstValueFrom(
+      this.packagesService.listOperatorHistory({ operatorId, page, limit }),
+    );
+  }
+
   private async audit(
     entityType: string,
     entityId: string,

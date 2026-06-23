@@ -1,0 +1,159 @@
+.operator-detail-page {
+  padding: 2rem;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.topbar {
+  margin-bottom: 2rem;
+}
+
+.eyebrow {
+  color: #666;
+  font-size: 0.875rem;
+  margin-bottom: 0.5rem;
+}
+
+.eyebrow a {
+  color: #007bff;
+  text-decoration: none;
+}
+
+.eyebrow a:hover {
+  text-decoration: underline;
+}
+
+h1 {
+  font-size: 2rem;
+  margin: 0;
+  color: #333;
+}
+
+.email {
+  color: #666;
+  margin-top: 0.25rem;
+}
+
+.history-section {
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  padding: 1.5rem;
+}
+
+header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+  border-bottom: 1px solid #eee;
+  padding-bottom: 1rem;
+}
+
+header h2 {
+  font-size: 1.25rem;
+  margin: 0;
+}
+
+.total {
+  color: #666;
+  font-size: 0.875rem;
+}
+
+.table-container {
+  overflow-x: auto;
+}
+
+.history-table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+}
+
+.history-table th {
+  padding: 1rem;
+  border-bottom: 2px solid #eee;
+  color: #666;
+  font-weight: 600;
+  font-size: 0.875rem;
+}
+
+.history-table td {
+  padding: 1rem;
+  border-bottom: 1px solid #eee;
+  font-size: 0.875rem;
+}
+
+.tracking-code {
+  font-family: monospace;
+  background: #f8f9fa;
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+  color: #333;
+}
+
+.status-badge {
+  padding: 0.25rem 0.75rem;
+  border-radius: 999px;
+  font-size: 0.75rem;
+  font-weight: 500;
+  text-transform: uppercase;
+}
+
+.status-badge[data-status="created"] { background: #e3f2fd; color: #1976d2; }
+.status-badge[data-status="received"] { background: #f3e5f5; color: #7b1fa2; }
+.status-badge[data-status="in_transit"] { background: #fff3e0; color: #f57c00; }
+.status-badge[data-status="delivered"] { background: #e8f5e9; color: #388e3c; }
+.status-badge[data-status="failed_delivery"] { background: #ffebee; color: #d32f2f; }
+.status-badge[data-status="returned"] { background: #eceff1; color: #455a64; }
+.status-badge[data-status="cancelled"] { background: #fafafa; color: #9e9e9e; }
+
+.comment {
+  color: #666;
+  max-width: 300px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.empty, .loading {
+  text-align: center;
+  padding: 3rem !important;
+  color: #999;
+}
+
+.pagination {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 1rem;
+  margin-top: 1.5rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid #eee;
+}
+
+.pagination button {
+  padding: 0.5rem 1rem;
+  border: 1px solid #ddd;
+  background: white;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.pagination button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.pagination span {
+  font-size: 0.875rem;
+  color: #666;
+}
+
+.error {
+  color: #d32f2f;
+  background: #ffebee;
+  padding: 1rem;
+  border-radius: 4px;
+  margin-bottom: 1rem;
+}

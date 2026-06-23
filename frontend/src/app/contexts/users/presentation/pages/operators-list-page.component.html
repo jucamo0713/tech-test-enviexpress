@@ -47,14 +47,19 @@
         {{ operator.active ? 'Acceso activo' : 'Acceso revocado' }}
       </span>
       <p>{{ formatDateTime(operator.createdAt) }}</p>
-      <button
-        type="button"
-        class="danger"
-        (click)="revokeAccess(operator)"
-        [disabled]="!operator.active"
-      >
-        Revocar acceso
-      </button>
+      <div class="actions">
+        <a [routerLink]="['/operators', operator.id]" class="button secondary">
+          Ver historial
+        </a>
+        <button
+          type="button"
+          class="danger"
+          (click)="revokeAccess(operator)"
+          [disabled]="!operator.active"
+        >
+          Revocar acceso
+        </button>
+      </div>
     </article>
   </section>
 

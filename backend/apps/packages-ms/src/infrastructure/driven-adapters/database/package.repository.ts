@@ -278,6 +278,48 @@ export class PackageRepository {
     }));
   }
 
+  async listOperatorHistoryPaginated(input: {
+    operatorId: string;
+    page: number;
+    limit: number;
+  }): Promise<{ items: any[]; total: number }> {
+    const skip = (input.page - 1) * input.limit;
+
+    const pipeline: any[] = [
+      { $unwind: '$history' },
+      { $match: { 'history.changedBy': input.operatorId } },
+      { $sort: { 'history.changedAt': -1 } },
+      {
+        $facet: {
+          metadata: [{ $count: 'total' }],
+          data: [
+            { $skip: skip },
+            { $limit: input.limit },
+            {
+              $project: {
+                _id: 0,
+                packageId: '$id',
+                trackingCode: 1,
+                status: '$history.status',
+                comment: '$history.comment',
+                changedAt: '$history.changedAt',
+              },
+            },
+          ],
+        },
+      },
+    ];
+
+    const result = await this.packageModel.aggregate(pipeline);
+    const total = result[0].metadata[0]?.total ?? 0;
+    const items = result[0].data.map((item: any) => ({
+      ...item,
+      changedAt: item.changedAt.toISOString(),
+    }));
+
+    return { items, total };
+  }
+
   private buildListFilter(input: {
     status?: string;
     startDate?: string;

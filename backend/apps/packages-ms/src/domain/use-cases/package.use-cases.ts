@@ -108,6 +108,12 @@ export class UpdatePackageStatusUseCase {
     }
 
     const updated = await this.repository.updateStatus(payload);
+
+    await Promise.all([
+      this.redisPubSub.delete(`package-status:id:${updated.id}`),
+      this.redisPubSub.delete(`package-status:tracking:${updated.trackingCode}`),
+    ]);
+
     await this.redisPubSub.publish('package.status.changed', {
       id: updated.id,
       name: 'package.status.changed',

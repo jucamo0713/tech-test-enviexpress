@@ -24,7 +24,7 @@
         <input type="email" formControlName="email" autocomplete="email" />
       </label>
       <label>
-        Contrasena
+        Contraseña
         <input type="password" formControlName="password" autocomplete="new-password" />
       </label>
       <button type="submit" [disabled]="isCreating()">
@@ -64,7 +64,7 @@
     <button type="button" (click)="previousPage()" [disabled]="page() <= 1">
       Anterior
     </button>
-    <span>Pagina {{ page() }} de {{ totalPages() }}</span>
+    <span>Página {{ page() }} de {{ totalPages() }}</span>
     <button type="button" (click)="nextPage()" [disabled]="page() >= totalPages()">
       Siguiente
     </button>
@@ -74,7 +74,7 @@
     <section class="confirm-modal" role="dialog" aria-modal="true" aria-labelledby="revoke-operator-title">
       <h2 id="revoke-operator-title">Revocar acceso</h2>
       <p>
-        Se revocara el acceso de {{ operator.name }}. Este usuario no podra iniciar sesion ni seguir usando tokens activos.
+        Se revocará el acceso de {{ operator.name }}. Este usuario no podrá iniciar sesión ni seguir usando tokens activos.
       </p>
       <div class="modal-actions">
         <button type="button" class="secondary" (click)="cancelRevoke()">Cancelar</button>

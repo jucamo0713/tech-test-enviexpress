@@ -69,11 +69,11 @@ export class GetPackageStatusUseCase {
 
   private async cachePackage(packageRecord: PackagesProto.PackageResponse) {
     await Promise.all([
-      this.redisPubSub.setJson(`package-status:id:${packageRecord.id}`, packageRecord, 300),
+      this.redisPubSub.setJson(`package-status:id:${packageRecord.id}`, packageRecord, 120),
       this.redisPubSub.setJson(
         `package-status:tracking:${packageRecord.trackingCode}`,
         packageRecord,
-        300,
+        120,
       ),
     ]);
   }

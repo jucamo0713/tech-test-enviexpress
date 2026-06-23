@@ -1,6 +1,6 @@
-# Deploy y pruebas rapidas
+# Deploy y pruebas rápidas
 
-Guia corta para levantar Enviexpress localmente y validar las funcionalidades principales.
+Guía corta para levantar Enviexpress localmente y validar las funcionalidades principales.
 
 ## Requisitos
 
@@ -38,7 +38,7 @@ docker compose up --build
 
 ## Usuarios demo
 
-Se crean automaticamente al iniciar los microservicios:
+Se crean automáticamente al iniciar los microservicios:
 
 | Rol | Email | Password |
 | --- | --- | --- |
@@ -134,10 +134,10 @@ curl -X POST http://localhost:3001/api/auth/register-client \
 ## Que validar
 
 - El login devuelve JWT y respeta roles.
-- Admin/operador pueden gestionar clientes y paquetes.
+- Admin/operador pueden gestiónar clientes y paquetes.
 - Cliente solo ve sus paquetes.
-- Los estados de paquete siguen la maquina de estados.
+- Los estados de paquete siguen la máquina de estados.
 - La consulta publica no requiere login y oculta el actor del historial.
-- Redis Pub/Sub actualiza trazabilidad y auditoria sin bloquear la operacion principal.
-- `audit-ms` no expone gRPC; consume eventos de auditoria desde Redis.
+- Redis Pub/Sub actualiza trazabilidad y auditoría sin bloquear la operación principal.
+- `audit-ms` no expone gRPC; consume eventos de auditoría desde Redis.
 

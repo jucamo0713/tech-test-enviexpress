@@ -1,13 +1,18 @@
 <article class="panel">
-  <h2>Estado</h2>
+  <header class="panel-header">
+    <h2>Estado</h2>
+    <button type="button" class="close-btn" (click)="close.emit()" *ngIf="selectedPackage">&times;</button>
+  </header>
   <ng-container *ngIf="selectedPackage; else empty">
     <p class="tracking">{{ selectedPackage.trackingCode }}</p>
-    <h3>{{ selectedPackage.status }}</h3>
+    <h3>{{ statusNames[selectedPackage.status] || selectedPackage.status }}</h3>
     <p>{{ selectedPackage.destinationAddress }}</p>
 
     <form [formGroup]="form" (ngSubmit)="submit()" *ngIf="validStatuses().length > 0; else finalState">
       <select formControlName="status">
-        <option *ngFor="let status of validStatuses()" [value]="status">{{ status }}</option>
+        <option *ngFor="let status of validStatuses()" [value]="status">
+          {{ statusNames[status] || status }}
+        </option>
       </select>
       <input placeholder="Comentario" formControlName="comment" />
       <button type="submit">Actualizar</button>
@@ -21,7 +26,7 @@
     <h3>Historial</h3>
     <ol>
       <li *ngFor="let item of selectedPackage.history">
-        <strong>{{ item.status }}</strong>
+        <strong>{{ statusNames[item.status] || item.status }}</strong>
         <span>{{ formatDateTime(item.changedAt) }}</span>
         <p *ngIf="item.comment">{{ item.comment }}</p>
         <small>Ejecutado por: {{ item.changedBy }}</small>

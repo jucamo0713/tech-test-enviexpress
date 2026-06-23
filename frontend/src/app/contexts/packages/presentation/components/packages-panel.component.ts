@@ -8,6 +8,7 @@ import {
   PackageListFilters,
   PackageItem,
   UpdatePackageRequest,
+  PACKAGE_STATUS_NAMES,
 } from '../../domain/models/package.model';
 
 @Component({
@@ -28,6 +29,8 @@ export class PackagesPanelComponent {
   @Output() filtersChange = new EventEmitter<PackageListFilters>();
   @Output() updatePackage = new EventEmitter<{ id: string; request: UpdatePackageRequest }>();
   @Output() deletePackage = new EventEmitter<string>();
+
+  readonly statusNames = PACKAGE_STATUS_NAMES;
 
   readonly statusOptions = [
     'created',
@@ -181,7 +184,7 @@ export class PackagesPanelComponent {
     }
 
     return this.form.controls.description.valid &&
-      this.form.controls.destinationAddress.valid;
+      (this.form.controls.destinationAddress.valid || this.form.controls.destinationAddress.disabled);
   }
 
   applyFilters(): void {
@@ -206,6 +209,10 @@ export class PackagesPanelComponent {
   clearFilters(): void {
     this.filtersForm.reset();
     this.filtersChange.emit({});
+  }
+
+  copyToClipboard(text: string): void {
+    void navigator.clipboard.writeText(text);
   }
 
   private normalizedFilters(): PackageListFilters {

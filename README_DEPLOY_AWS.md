@@ -1,6 +1,6 @@
 # Despliegue en AWS
 
-Este documento describe una forma productiva de desplegar Enviexpress en AWS manteniendo la arquitectura del repositorio: frontend Angular, API Gateway NestJS, microservicios NestJS por dominio, MongoDB, Redis Pub/Sub y comunicacion interna por gRPC.
+Este documento describe una forma productiva de desplegar Enviexpress en AWS manteniendo la arquitectura del repositorio: frontend Angular, API Gateway NestJS, microservicios NestJS por dominio, MongoDB, Redis Pub/Sub y comunicación interna por gRPC.
 
 ## Vista general
 
@@ -9,11 +9,11 @@ flowchart LR
     U[Usuarios] --> CF[CloudFront]
     CF --> S3[S3 frontend Angular]
     U --> AGW[API Gateway HTTP]
-    AGW --> ALB[Application Load Balancer publico]
+    AGW --> ALB[Application Load Balancer público]
     ALB --> GW[ECS Fargate api-gateway]
 
     subgraph VPC[VPC]
-      subgraph Public[Subnets publicas]
+      subgraph Public[Subnets públicas]
         ALB
       end
       subgraph Private[Subnets privadas]
@@ -68,24 +68,24 @@ Cada Dockerfile del backend se publica como una imagen independiente en Amazon E
 | Audit | `backend/dockerfiles/audit-ms.Dockerfile` | `enviexpress/audit-ms` |
 | Frontend | `frontend/Dockerfile` | `enviexpress/frontend` si se sirve como contenedor |
 
-La recomendacion para el frontend es compilar Angular y publicar los assets en S3 + CloudFront. El contenedor `frontend` queda util para despliegue homogeneo, demos o ambientes donde se prefiera servir Nginx desde ECS.
+La recomendación para el frontend es compilar Angular y publicar los assets en S3 + CloudFront. El contenedor `frontend` queda útil para despliegue homogéneo, demos o ambientes donde se prefiera servir Nginx desde ECS.
 
 Buenas practicas para ECR:
 
-- Etiquetar imagenes con `git SHA`, version semantica y ambiente, por ejemplo `api-gateway:1.0.0-a1b2c3d`.
+- Etiquetar imágenes con `git SHA`, versión semántica y ambiente, por ejemplo `api-gateway:1.0.0-a1b2c3d`.
 - Activar escaneo de vulnerabilidades.
-- Habilitar politicas de lifecycle para retener solo las ultimas N imagenes por ambiente.
+- Habilitar políticas de lifecycle para retener solo las ultimás N imágenes por ambiente.
 - No incluir secretos en la imagen; todo secreto entra por Secrets Manager o SSM Parameter Store.
 
 ## ECS Fargate
 
-La aplicacion se despliega en un cluster ECS con launch type Fargate. Cada microservicio debe ser un ECS Service separado para poder escalar, reiniciar y desplegar de forma independiente.
+La aplicación se despliega en un cluster ECS con launch type Fargate. Cada microservicio debe ser un ECS Service separado para poder escalar, reiniciar y desplegar de forma independiente.
 
 Servicios recomendados:
 
-- `api-gateway`: unico backend HTTP expuesto al balanceador.
+- `api-gateway`: único backend HTTP expuesto al balanceador.
 - `auth-ms`, `users-ms`, `clients-ms`, `packages-ms`, `package-status-ms`: servicios privados con puerto gRPC interno.
-- `audit-ms`: servicio privado que consume eventos de Redis y persiste auditoria.
+- `audit-ms`: servicio privado que consume eventos de Redis y persiste auditoría.
 
 Cada ECS Task Definition define:
 
@@ -96,27 +96,27 @@ Cada ECS Task Definition define:
 - Logs a CloudWatch Logs con un grupo por servicio.
 - Health checks por contenedor cuando el servicio exponga endpoint HTTP; para gRPC se puede usar un health endpoint interno o checks TCP a nivel de ECS/ALB interno.
 
-## Balanceadores de carga y exposicion
+## Balanceadores de carga y exposición
 
-La exposicion publica debe limitarse al minimo:
+La exposición publica debe limitarse al mínimo:
 
 - Frontend: S3 + CloudFront.
-- Backend HTTP: API Gateway de AWS o CloudFront apunta al ALB publico.
-- API Gateway NestJS: unico contenedor backend accesible desde el ALB.
-- Microservicios gRPC: nunca publicos; reciben trafico a traves de balanceadores internos dentro de la VPC.
-- MongoDB y Redis: nunca publicos.
+- Backend HTTP: API Gateway de AWS o CloudFront apunta al ALB público.
+- API Gateway NestJS: único contenedor backend accesible desde el ALB.
+- Microservicios gRPC: nunca públicos; reciben trafico a traves de balanceadores internos dentro de la VPC.
+- MongoDB y Redis: nunca públicos.
 
 Flujo recomendado:
 
 1. El navegador carga Angular desde CloudFront.
-2. Angular consume `/api` por un dominio publico, por ejemplo `api.enviexpress.com`.
-3. AWS API Gateway aplica TLS, throttling, WAF opcional y rutas publicas.
+2. Angular consume `/api` por un dominio público, por ejemplo `api.enviexpress.com`.
+3. AWS API Gateway aplica TLS, throttling, WAF opciónal y rutas públicas.
 4. API Gateway de AWS reenvia al ALB.
 5. El ALB enruta solo hacia el ECS Service `api-gateway`.
 6. `api-gateway` llama a cada microservicio por gRPC usando el DNS privado del balanceador interno correspondiente.
 7. Cada balanceador interno distribuye trafico entre las tasks sanas del ECS Service asociado.
 
-Si se quiere simplificar para una prueba tecnica, se puede omitir AWS API Gateway y exponer directamente el ALB con TLS + WAF. Para produccion, API Gateway agrega throttling, cuotas, autorizadores, logging de borde y control mas fino de exposicion.
+Si se quiere simplificar para una prueba técnica, se puede omitir AWS API Gateway y exponer directamente el ALB con TLS + WAF. Para producción, API Gateway agrega throttling, cuotas, autorizadores, logging de borde y control más fino de exposición.
 
 ### Balanceadores internos para gRPC
 
@@ -130,9 +130,9 @@ Entre el API Gateway NestJS y los microservicios se recomienda usar Network Load
 | `packages-ms` | `packages-grpc.internal:50054` | tasks de `packages-ms` | `GRPC_PACKAGES_URL` |
 | `package-status-ms` | `package-status-grpc.internal:50055` | tasks de `package-status-ms` | `GRPC_PACKAGE_STATUS_URL` |
 
-El NLB interno es adecuado para gRPC porque opera en capa 4, soporta conexiones largas y no expone los servicios fuera de la VPC. Cada ECS Service registra sus tasks en su target group con target type `ip`, que es el modo correcto para Fargate.
+El NLB interno es adecuado para gRPC porque opera en capa 4, soporta conexiónes largas y no expone los servicios fuera de la VPC. Cada ECS Service registra sus tasks en su target group con target type `ip`, que es el modo correcto para Fargate.
 
-Puntos de configuracion:
+Puntos de configuración:
 
 - Crear un NLB interno por microservicio o un NLB interno compartido con listeners/target groups separados por puerto.
 - Asociar cada ECS Service a su target group para que ECS registre nuevas tasks y retire tasks al hacer scale in, deploy o reemplazo por fallo.
@@ -145,7 +145,7 @@ Puntos de configuracion:
 
 Cada ECS Service debe tener Application Auto Scaling configurado de forma independiente.
 
-Politicas iniciales sugeridas:
+Políticas iniciales sugeridas:
 
 | Servicio | Min | Max | Metrica principal |
 | --- | --- | --- | --- |
@@ -157,54 +157,54 @@ Politicas iniciales sugeridas:
 | `clients-ms` | 1 | 4 | CPU 60% |
 | `audit-ms` | 1 | 4 | backlog de acciones pendientes/fallidas y eventos procesados |
 
-El escalado por CPU es suficiente para empezar, pero los servicios asincronos necesitan metricas de negocio: acciones derivadas pendientes, eventos procesados por minuto y cantidad de fallos. Redis Pub/Sub no conserva backlog, asi que la fuente confiable para recuperacion sigue siendo MongoDB con acciones `PENDING` o `FAILED`.
+El escalado por CPU es suficiente para empezar, pero los servicios asíncronos necesitan métricas de negocio: acciones derivadas pendientes, eventos procesados por minuto y cantidad de fallos. Redis Pub/Sub no conserva backlog, así que la fuente confiable para recuperación sigue siendo MongoDB con acciones `PENDING` o `FAILED`.
 
-Cuando un microservicio escala horizontalmente, ECS registra automaticamente las nuevas tasks en el target group del NLB interno. El API Gateway NestJS no necesita conocer cuantas instancias existen; solo consume el DNS privado del balanceador. Esto mantiene desacoplados el cliente gRPC y el ciclo de vida de cada microservicio.
+Cuando un microservicio escala horizontalmente, ECS registra automáticamente las nuevas tasks en el target group del NLB interno. El API Gateway NestJS no necesita conocer cuántas instancias existen; solo consume el DNS privado del balanceador. Esto mantiene desacoplados el cliente gRPC y el ciclo de vida de cada microservicio.
 
 ## Redis en AWS
 
 Redis debe desplegarse como Amazon ElastiCache for Redis dentro de subnets privadas.
 
-Uso en esta solucion:
+Uso en esta solución:
 
 - Broker Pub/Sub para eventos de dominio.
-- Desacoplar acciones derivadas y auditoria de la respuesta HTTP principal.
+- Desacoplar acciones derivadas y auditoría de la respuesta HTTP principal.
 - Evitar que el cambio de estado de paquete bloquee por tareas secundarias.
 
-Configuracion recomendada:
+Configuración recomendada:
 
-- Cluster privado, sin acceso publico.
+- Cluster privado, sin acceso público.
 - TLS habilitado si el plan/region lo soporta.
 - Auth token administrado en Secrets Manager.
 - Security Group que permita `6379` solo desde los Security Groups de los ECS Services.
-- Multi-AZ para produccion.
-- Alarmas de CPU, memoria, conexiones, evictions y errores.
+- Multi-AZ para producción.
+- Alarmás de CPU, memoria, conexiónes, evictions y errores.
 
 Nota operativa: Redis Pub/Sub no garantiza entrega persistente. Para mayor robustez futura, se puede migrar a Redis Streams, SQS, SNS/SQS, EventBridge, RabbitMQ o Kafka. En esta entrega se mitiga guardando acciones derivadas en MongoDB y permitiendo reproceso.
 
 ## MongoDB administrado por MongoDB
 
-La base de datos se recomienda en MongoDB Atlas, no como contenedor propio en ECS. Atlas provee replica set, backups, monitoreo, escalado, cifrado y mantenimiento administrado.
+La base de datos se recomienda en MongoDB Atlas, no como contenedor propio en ECS. Atlas provee réplica set, backups, monitoreo, escalado, cifrado y mantenimiento administrado.
 
-Configuracion recomendada:
+Configuración recomendada:
 
-- Cluster replica set en la misma region AWS del backend.
+- Cluster réplica set en la misma region AWS del backend.
 - Conexion privada mediante VPC Peering o AWS PrivateLink entre la VPC de AWS y Atlas.
 - IP allowlist restringida a la red privada cuando aplique.
-- Backups automaticos con point-in-time recovery.
+- Backups automáticos con point-in-time recovery.
 - Cifrado en reposo y TLS en transito.
-- Usuarios de base de datos por ambiente con privilegios minimos.
-- Indices creados/versionados por scripts o migraciones controladas.
+- Usuarios de base de datos por ambiente con privilegios mínimos.
+- Índices creados/versionados por scripts o migraciones controladas.
 
-MongoDB es la fuente de verdad para usuarios, clientes, paquetes, historial, acciones derivadas y auditoria. Redis no debe contener datos indispensables sin respaldo en MongoDB.
+MongoDB es la fuente de verdad para usuarios, clientes, paquetes, historial, acciones derivadas y auditoría. Redis no debe contener datos indispensables sin respaldo en MongoDB.
 
 ## VPC, subnets y seguridad de red
 
-La VPC debe separar recursos publicos y privados:
+La VPC debe separar recursos públicos y privados:
 
-- Subnets publicas: ALB publico, NAT Gateways si se necesitan salidas a internet desde subnets privadas.
+- Subnets públicas: ALB público, NAT Gateways si se necesitan salidas a internet desde subnets privadas.
 - Subnets privadas: ECS Fargate, ElastiCache Redis y conectividad privada a MongoDB Atlas.
-- Internet Gateway: solo para recursos publicos.
+- Internet Gateway: solo para recursos públicos.
 - NAT Gateway: salida controlada desde ECS para descargar dependencias externas o comunicarse con servicios AWS si no se usan VPC endpoints.
 - VPC endpoints: ECR, CloudWatch Logs, Secrets Manager y SSM para reducir trafico por NAT.
 
@@ -217,9 +217,9 @@ Security Groups:
 - `redis-sg`: entrada `6379` solo desde servicios que publican/consumen eventos.
 - Atlas: acceso solo por PrivateLink/VPC peering o rangos privados definidos.
 
-## API Gateway y rutas publicas
+## API Gateway y rutas públicas
 
-Aunque existe un API Gateway NestJS dentro de la solucion, AWS API Gateway puede actuar como capa perimetral administrada.
+Aunque existe un API Gateway NestJS dentro de la solución, AWS API Gateway puede actuar como capa perimetral administrada.
 
 Responsabilidades del AWS API Gateway:
 
@@ -227,15 +227,15 @@ Responsabilidades del AWS API Gateway:
 - TLS administrado con ACM.
 - Throttling por ruta o por cliente.
 - Logs de acceso.
-- Integracion con WAF si se requiere proteccion basica ante bots o ataques comunes.
+- Integración con WAF si se requiere protección básica ante bots o ataques comunes.
 
 Responsabilidades del API Gateway NestJS:
 
 - Contrato REST/OpenAPI del dominio.
-- Autenticacion JWT y RBAC de aplicacion.
+- Autenticación JWT y RBAC de aplicación.
 - CORS.
-- Validacion de DTOs.
-- Orquestacion hacia microservicios gRPC privados.
+- Validación de DTOs.
+- Orquestación hacia microservicios gRPC privados.
 
 No se deben publicar puertos gRPC ni endpoints de microservicios directamente en internet.
 
@@ -262,7 +262,7 @@ REDIS_URL=rediss://<elasticache-private-endpoint>:6379
 MONGO_URI=mongodb+srv://<atlas-private-endpoint>/enviexpress
 ```
 
-Los nombres internos pueden resolverse con Route 53 Private Hosted Zone apuntando a los NLB internos. ECS Service Connect o AWS Cloud Map tambien son opciones validas, pero si se quiere que el balanceo lo gestione un recurso explicito de AWS, los NLB internos con target groups por servicio dejan el comportamiento mas claro.
+Los nombres internos pueden resolverse con Route 53 Private Hosted Zone apuntando a los NLB internos. ECS Service Connect o AWS Cloud Map también son opciónes válidas, pero si se quiere que el balanceo lo gestióne un recurso explicito de AWS, los NLB internos con target groups por servicio dejan el comportamiento más claro.
 
 ## CI/CD sugerido
 
@@ -271,12 +271,12 @@ Pipeline por ambiente:
 1. Instalar dependencias.
 2. Ejecutar lint y pruebas.
 3. Construir cada imagen Docker.
-4. Escanear imagenes.
-5. Publicar imagenes en ECR.
+4. Escanear imágenes.
+5. Publicar imágenes en ECR.
 6. Actualizar task definitions con el nuevo tag.
 7. Desplegar ECS Services con rolling deployment o blue/green.
-8. Ejecutar smoke tests contra `/api/health` y endpoints criticos.
-9. Promocionar a produccion con aprobacion manual.
+8. Ejecutar smoke tests contra `/api/health` y endpoints críticos.
+9. Promocionar a producción con aprobación manual.
 
 Para el frontend:
 
@@ -284,28 +284,28 @@ Para el frontend:
 2. Publicar `dist/` en S3.
 3. Invalidar CloudFront.
 
-## Observabilidad y operacion
+## Observabilidad y operación
 
 Minimo esperado:
 
 - CloudWatch Logs por servicio.
-- Metricas ECS: CPU, memoria, reinicios, task count.
-- Metricas ALB/API Gateway: request count, 4xx, 5xx, latencia p95/p99.
-- Metricas de dominio: cambios de estado, acciones derivadas pendientes/fallidas, eventos procesados.
-- Alarmas para error rate alto, latencia alta, caida de tasks, Redis sin memoria, MongoDB con conexiones altas o storage bajo.
-- `requestId` propagado desde frontend/API Gateway hacia gRPC, eventos Redis, auditoria y logs.
+- Métricas ECS: CPU, memoria, reinicios, task count.
+- Métricas ALB/API Gateway: request count, 4xx, 5xx, latencia p95/p99.
+- Métricas de dominio: cambios de estado, acciones derivadas pendientes/fallidas, eventos procesados.
+- Alarmás para error rate alto, latencia alta, caida de tasks, Redis sin memoria, MongoDB con conexiónes altas o storage bajo.
+- `requestId` propagado desde frontend/API Gateway hacia gRPC, eventos Redis, auditoría y logs.
 
-## Backups y recuperacion
+## Backups y recuperación
 
-- MongoDB Atlas con backups automaticos y point-in-time recovery.
-- Prueba periodica de restauracion en ambiente aislado.
+- MongoDB Atlas con backups automáticos y point-in-time recovery.
+- Prueba periódica de restauración en ambiente aislado.
 - Redis sin rol de fuente de verdad; las acciones pendientes/fallidas en MongoDB permiten reproceso.
 - Definir RPO/RTO por ambiente.
-- Exportar logs de auditoria si hay requerimientos de retencion legal.
+- Exportar logs de auditoría si hay requerimientos de retención legal.
 
 ## Que podria estar faltando
 
-La propuesta cubre computo, red, registros de contenedores, escalado, cache/eventos, base de datos y exposicion. Para una entrega mas completa de produccion agregaria:
+La propuesta cubre cómputo, red, registros de contenedores, escalado, cache/eventos, base de datos y exposición. Para una entrega más completa de producción agregaría:
 
 - IaC con Terraform, AWS CDK o CloudFormation para que la infraestructura sea reproducible.
 - Ambiente `staging` separado de `production`.
@@ -313,10 +313,10 @@ La propuesta cubre computo, red, registros de contenedores, escalado, cache/even
 - ACM + Route 53 para dominios y certificados.
 - Estrategia blue/green o canary para despliegues.
 - Health endpoint real por servicio y endpoint `/api/health` en el gateway.
-- Health checks especificos para gRPC en los target groups internos.
-- Politicas IAM de minimo privilegio por task.
-- Retencion de logs y politicas de privacidad para datos sensibles.
-- Gestion de migraciones/indices de MongoDB por version.
+- Health checks específicos para gRPC en los target groups internos.
+- Políticas IAM de mínimo privilegio por task.
+- Retención de logs y políticas de privacidad para datos sensibles.
+- Gestión de migraciones/índices de MongoDB por versión.
 - Plan de reproceso para acciones derivadas `PENDING` o `FAILED`.
 - Presupuestos y alertas de costo.
-- Documentacion de RPO/RTO, runbooks y procedimiento de rollback.
+- Documentación de RPO/RTO, runbooks y procedimiento de rollback.

@@ -1,61 +1,61 @@
 # tech-test-enviexpress
 
-Arquitectura propuesta para una plataforma pequena de gestion logistica. El foco es entregar una solucion funcional en 3 dias, con backend, frontend, persistencia real, procesos derivados no bloqueantes y una propuesta productiva defendible.
+Arquitectura propuesta para una plataforma pequeña de gestión logística. El foco es entregar una solución funcional en 3 días, con backend, frontend, persistencia real, procesos derivados no bloqueantes y una propuesta productiva defendible.
 
 ## Objetivo
 
-Construir una aplicacion para:
+Construir una aplicación para:
 
-- Gestionar usuarios, roles y permisos.
+- Gestiónar usuarios, roles y permisos.
 - Registrar clientes y paquetes.
 - Controlar cambios de estado con reglas de negocio.
 - Guardar trazabilidad completa de cada paquete.
-- Procesar acciones derivadas de forma asincrona.
-- Consultar operacion mediante listados, filtros y dashboard.
+- Procesar acciones derivadas de forma asíncrona.
+- Consultar operación mediante listados, filtros y dashboard.
 - Explicar una ruta clara de despliegue seguro en cloud.
 
 ## Stack elegido
 
 ### Backend
 
-- **NestJS + TypeScript**: estructura modular, inyeccion de dependencias, guards, pipes, interceptors y buen soporte para testing.
-- **NestJS Microservices**: separacion agil de logica usando transportes soportados por NestJS, sin pagar el costo completo de una arquitectura distribuida desde el primer dia.
-- **API Gateway NestJS**: unico punto de entrada HTTP para el frontend; centraliza CORS, autenticacion perimetral, rate limit, Swagger y enrutamiento hacia microservicios internos.
-- **gRPC interno**: comunicacion sincrona entre gateway y microservicios cuando se necesita respuesta inmediata, por ejemplo login, usuarios, clientes, paquetes y consulta de estado.
-- **MongoDB**: persistencia documental simple, rapida de levantar localmente y flexible para guardar paquetes, historial y acciones derivadas sin sobredimensionar la prueba.
-- **Mongoose**: schemas, validaciones, indices y modelos tipados para mantener disciplina sobre MongoDB desde la capa de codigo.
-- **Redis Pub/Sub**: comunicacion asincrona entre microservicios para acciones derivadas y eventos de dominio, evitando bloquear la operacion principal.
-- **JWT + RBAC**: autenticacion simple y autorizacion por rol/permisos.
-- **Swagger/OpenAPI**: documentacion reproducible de API.
+- **NestJS + TypeScript**: estructura modular, inyección de dependencias, guards, pipes, interceptors y buen soporte para testing.
+- **NestJS Microservices**: separación ágil de lógica usando transportes soportados por NestJS, sin pagar el costo completo de una arquitectura distribuida desde el primer dia.
+- **API Gateway NestJS**: único punto de entrada HTTP para el frontend; centraliza CORS, autenticación perimetral, rate limit, Swagger y enrutamiento hacia microservicios internos.
+- **gRPC interno**: comunicación síncrona entre gateway y microservicios cuando se necesita respuesta inmediata, por ejemplo login, usuarios, clientes, paquetes y consulta de estado.
+- **MongoDB**: persistencia documental simple, rápida de levantar localmente y flexible para guardar paquetes, historial y acciones derivadas sin sobredimensionar la prueba.
+- **Mongoose**: schemas, validaciones, índices y modelos tipados para mantener disciplina sobre MongoDB desde la capa de código.
+- **Redis Pub/Sub**: comunicación asíncrona entre microservicios para acciones derivadas y eventos de dominio, evitando bloquear la operación principal.
+- **JWT + RBAC**: autenticación simple y autorización por rol/permisos.
+- **Swagger/OpenAPI**: documentación reproducible de API.
 
 ### Frontend
 
-- **Angular 22 + TypeScript**: framework opinionado, buen soporte para modulos/rutas, formularios reactivos, interceptores HTTP, guards y una estructura mantenible para una prueba con varios flujos.
-- **NgRx Store/Effects**: estado predecible para sesion, filtros, dashboard y flujos que requieren sincronizacion entre vistas.
-- **CQRS frontend del template**: comandos, queries, eventos, handlers y facades para separar presentacion, orquestacion y acceso a datos.
+- **Angular 22 + TypeScript**: framework opinionado, buen soporte para módulos/rutas, formularios reactivos, interceptores HTTP, guards y una estructura mantenible para una prueba con varios flujos.
+- **NgRx Store/Effects**: estado predecible para sesión, filtros, dashboard y flujos que requieren sincronización entre vistas.
+- **CQRS frontend del template**: comandos, queries, eventos, handlers y facades para separar presentación, orquestación y acceso a datos.
 - **Angular HttpClient interceptors + wrapper HTTP compartido con Axios**: capa centralizada para token, `requestId`, timeout y mapeo de errores.
 - **Angular i18n**: base para textos localizados; el template incluye mensajes base y `es-CO`.
-- **Tailwind CSS + Flowbite**: componentes visuales y estilos utilitarios para construir rapido una interfaz operativa.
+- **Tailwind CSS + Flowbite**: componentes visuales y estilos utilitarios para construir rápido una interfaz operativa.
 - **Vitest**: pruebas unitarias del frontend.
 
 ### Infraestructura local
 
-- **Docker Compose** para levantar MongoDB en replica set de un nodo y Redis.
+- **Docker Compose** para levantar MongoDB en réplica set de un nodo y Redis.
 - API Gateway, microservicios, Redis, MongoDB y frontend ejecutables localmente con comandos separados.
 
 ### Alternativas descartadas
 
-- **Next.js fullstack**: util, pero mezcla responsabilidades que la prueba pide separar claramente: frontend, backend, base de datos y procesos asincronos.
-- **React + Vite**: tambien seria suficiente, pero el proyecto ya parte de un template Angular con CQRS, NgRx, i18n, interceptores y convenciones de arquitectura que aceleran la entrega.
-- **GraphQL**: se considera por su flexibilidad para consultas de dashboard y detalle, pero se descarta para esta prueba porque agrega schema, resolvers, autorizacion por campo y convenciones extra. REST/OpenAPI es mas directo, facil de probar y suficiente para los flujos requeridos.
-- **PostgreSQL**: se considera por sus restricciones relacionales e integridad referencial, pero se descarta para esta prueba buscando mayor simplicidad operativa y velocidad de implementacion. La integridad se compensa con validaciones rigurosas, transacciones de MongoDB cuando aplique e indices bien definidos.
-- **BullMQ**: util para colas con reintentos avanzados, pero se evita para mantener la solucion mas cercana al soporte nativo de NestJS Microservices y demostrar comunicacion por eventos con Redis Pub/Sub.
-- **RabbitMQ/SQS desde el inicio**: validos en produccion, pero Redis Pub/Sub reduce complejidad para 3 dias y mantiene la asincronia demostrable.
-- **HTTP directo desde el frontend a cada microservicio**: se descarta para evitar exponer topologia interna, duplicar CORS/autenticacion y acoplar el frontend a varios contratos. El frontend consume solo el API Gateway.
-- **Microservicios completos por cada subcapacidad pequena**: se consideran, pero se agrupan por dominio para no fragmentar demasiado. La separacion minima queda en gateway, auth, users, clients, packages, package-status y audit.
-- **Notificaciones externas**: se omiten correos, SMS, WhatsApp, push notifications y alertas externas ante errores asincronos. Para una primera entrega se considera innecesario por costo, configuracion de proveedores, manejo de plantillas, cuotas, reintentos externos y credenciales adicionales.
+- **Next.js fullstack**: útil, pero mezcla responsabilidades que la prueba pide separar claramente: frontend, backend, base de datos y procesos asíncronos.
+- **React + Vite**: también sería suficiente, pero el proyecto ya parte de un template Angular con CQRS, NgRx, i18n, interceptores y convenciones de arquitectura que aceleran la entrega.
+- **GraphQL**: se considera por su flexibilidad para consultas de dashboard y detalle, pero se descarta para esta prueba porque agrega schema, resolvers, autorización por campo y convenciones extra. REST/OpenAPI es más directo, fácil de probar y suficiente para los flujos requeridos.
+- **PostgreSQL**: se considera por sus restricciones relacionales e integridad referencial, pero se descarta para esta prueba buscando mayor simplicidad operativa y velocidad de implementación. La integridad se compensa con validaciones rigurosas, transacciones de MongoDB cuando aplique e índices bien definidos.
+- **BullMQ**: útil para colas con reintentos avanzados, pero se evita para mantener la solución más cercana al soporte nativo de NestJS Microservices y demostrar comunicación por eventos con Redis Pub/Sub.
+- **RabbitMQ/SQS desde el inicio**: válidos en producción, pero Redis Pub/Sub reduce complejidad para 3 días y mantiene la asincronia demostrable.
+- **HTTP directo desde el frontend a cada microservicio**: se descarta para evitar exponer topología interna, duplicar CORS/autenticación y acoplar el frontend a varios contratos. El frontend consume solo el API Gateway.
+- **Microservicios completos por cada subcapacidad pequeña**: se consideran, pero se agrupan por dominio para no fragmentar demasiado. La separación mínima queda en gateway, auth, users, clients, packages, package-status y audit.
+- **Notificaciones externas**: se omiten correos, SMS, WhatsApp, push notifications y alertas externas ante errores asíncronos. Para una primera entrega se considera innecesario por costo, configuración de proveedores, manejo de plantillas, cuotas, reintentos externos y credenciales adicionales.
 
-## Arquitectura logica
+## Arquitectura lógica
 
 ```mermaid
 flowchart LR
@@ -83,18 +83,18 @@ flowchart LR
 ### Componentes
 
 - **Frontend**: aplica permisos visuales, formularios, listados paginados, filtros, dashboard y detalle de paquete.
-- **API Gateway**: unico endpoint publico para el frontend. Valida el JWT a nivel perimetral, aplica rate limit/CORS, documenta REST con Swagger y llama microservicios internos por gRPC.
+- **API Gateway**: único endpoint público para el frontend. Valida el JWT a nivel perimetral, aplica rate limit/CORS, documenta REST con Swagger y llama microservicios internos por gRPC.
 - **Base de datos**: fuente de verdad para usuarios, clientes, paquetes, historial y acciones derivadas.
-- **Auth Microservice**: login, emision/validacion de tokens, hash de password y resolucion de sesion actual.
-- **Users Microservice**: gestion de usuarios, roles y estado activo/inactivo.
-- **Clients Microservice**: registro, edicion y consulta de clientes.
-- **Packages Microservice**: registro de paquetes, cambios de estado, maquina de estados, historial y publicacion de eventos de dominio.
-- **Package Status Microservice**: microservicio NestJS especifico para consultar estado, historial y trazabilidad de paquetes sin mezclar esa lectura operativa con comandos de escritura.
-- **Audit Microservice**: crea y consulta registros de auditoria de diferentes entidades. Recibe eventos auditables y tambien expone gRPC para consultas administrativas.
+- **Auth Microservice**: login, emisión/validación de tokens, hash de password y resolución de sesión actual.
+- **Users Microservice**: gestión de usuarios, roles y estado activo/inactivo.
+- **Clients Microservice**: registro, edición y consulta de clientes.
+- **Packages Microservice**: registro de paquetes, cambios de estado, máquina de estados, historial y publicación de eventos de dominio.
+- **Package Status Microservice**: microservicio NestJS específico para consultar estado, historial y trazabilidad de paquetes sin mezclar esa lectura operativa con comandos de escritura.
+- **Audit Microservice**: crea y consulta registros de auditoría de diferentes entidades. Recibe eventos auditables y también expone gRPC para consultas administrativas.
 - **Derived actions**: concepto transversal para acciones generadas por cambios de estado. No es un microservicio independiente; se implementa como consumidores/event handlers dentro de `packages-ms` o como proceso interno del mismo dominio.
-- **Estadisticas operativas**: no son un microservicio separado; cada microservicio expone sus consultas estadisticas propias y el API Gateway compone el resumen del dashboard cuando sea necesario.
-- **gRPC**: canal interno sincrono gateway-microservicios, con contratos `.proto` versionables.
-- **Redis**: broker Pub/Sub para eventos asincronos entre microservicios.
+- **Estadísticas operativas**: no son un microservicio separado; cada microservicio expone sus consultas estadísticas propias y el API Gateway compone el resumen del dashboard cuando sea necesario.
+- **gRPC**: canal interno sincrono gateway-microservicios, con contratos `.proto` versiónables.
+- **Redis**: broker Pub/Sub para eventos asíncronos entre microservicios.
 
 ## Modulos backend
 
@@ -142,19 +142,19 @@ libs/
       domain/
       infrastructure/
         contracts/
-          proto/     Contratos gRPC versionables
+          proto/     Contratos gRPC versiónables
           events/    Contratos de eventos Redis Pub/Sub
         driven-adapters/
           grpc/      Clientes gRPC internos
           redis/     Cliente Redis Pub/Sub
 ```
 
-Cada app conserva la estructura del template backend, pero sin agregar un nivel `contexts` dentro de cada microservicio. La separacion por dominio ya esta dada por la app (`auth-ms`, `users-ms`, `packages-ms`, etc.):
+Cada app conserva la estructura del template backend, pero sin agregar un nivel `contexts` dentro de cada microservicio. La separación por dominio ya esta dada por la app (`auth-ms`, `users-ms`, `packages-ms`, etc.):
 
 ```text
 src/
   application/
-    config/          Configuracion propia del contexto
+    config/          Configuración propia del contexto
     providers/       Providers de use cases, handlers y gateways
     <app>.module.ts
   domain/
@@ -181,15 +181,15 @@ src/
 
 Responsabilidad por app:
 
-- `api-gateway`: controladores HTTP publicos, Swagger, guards, CORS, rate limit y clientes gRPC hacia microservicios.
-- `auth-ms`: login, emision/validacion de JWT, hash de password y sesion actual.
+- `api-gateway`: controladores HTTP públicos, Swagger, guards, CORS, rate limit y clientes gRPC hacia microservicios.
+- `auth-ms`: login, emisión/validación de JWT, hash de password y sesión actual.
 - `users-ms`: usuarios, roles, permisos y estado activo/inactivo.
-- `clients-ms`: gestion de clientes.
+- `clients-ms`: gestión de clientes.
 - `packages-ms`: paquetes, cambios de estado, historial, eventos Redis, `domain/state-machine` y `domain/derived-actions`.
 - `package-status-ms`: consultas optimizadas de estado, historial y trazabilidad.
-- `audit-ms`: creacion y consulta de auditorias por entidad, usuario y accion.
+- `audit-ms`: creación y consulta de auditorías por entidad, usuario y acción.
 
-`libs/shared` toma el `shared` del template backend como libreria reutilizable. No representa un dominio de negocio; contiene configuracion comun con `ConfigModule`, validacion de variables de entorno con Joi, errores, paginacion, value objects base, filtros, interceptores, logger, MongoDB, JWT, cliente de auditoria y helpers de NestJS. El modulo principal de cada app importa `SharedModule`.
+`libs/shared` toma el `shared` del template backend como librería reutilizable. No representa un dominio de negocio; contiene configuración común con `ConfigModule`, validación de variables de entorno con Joi, errores, paginación, value objects base, filtros, interceptores, logger, MongoDB, JWT, cliente de auditoría y helpers de NestJS. El módulo principal de cada app importa `SharedModule`.
 
 ## Rutas frontend
 
@@ -209,21 +209,21 @@ La interfaz debe ocultar acciones no permitidas, pero la seguridad real se aplic
 
 ## Arquitectura frontend Angular
 
-El repositorio ya incluye un template Angular en `frontend/` con separacion por contextos, capas y utilidades compartidas.
+El repositorio ya incluye un template Angular en `frontend/` con separación por contextos, capas y utilidades compartidas.
 
 ```text
 frontend/src/app/
   core/
-    config/          Configuracion de ambiente y tokens
+    config/          Configuración de ambiente y tokens
     cqrs/            Commands, queries, events, handlers y buses
-    errors/          Errores normalizados de aplicacion
+    errors/          Errores normalizados de aplicación
     http/            Interceptores de auth, requestId, timeout y errores
     i18n/            Locales soportados y providers
     utils/           Integraciones como Flowbite
   shared/
     components/      UI reutilizable
     http/            Cliente HTTP compartido
-    models/          Modelos comunes como paginacion
+    models/          Modelos comunes como paginación
     store/           Estado global compartido
     value-objects/   Value objects reutilizables
   contexts/
@@ -251,7 +251,7 @@ context-name/
 Reglas frontend:
 
 - Las pages dependen de facades.
-- Las facades orquestan CQRS, NgRx y servicios de aplicacion.
+- Las facades orquestan CQRS, NgRx y servicios de aplicación.
 - Los componentes no llaman HTTP directamente.
 - Los DTOs representan contratos de API; los modelos de dominio/UI representan estado de pantalla.
 - Los mappers no implementan reglas de negocio del backend.
@@ -261,11 +261,11 @@ Reglas frontend:
 
 | Rol | Permisos |
 | --- | --- |
-| Administrador | Gestionar usuarios, gestionar clientes, consultar paquetes, consultar dashboard |
+| Administrador | Gestiónar usuarios, gestiónar clientes, consultar paquetes, consultar dashboard |
 | Operador | Crear paquetes, cambiar estados, consultar clientes, consultar paquetes |
 | Cliente | Consultar su historial de paquetes y rastrear estados de paquetes asociados a su cuenta |
 
-Los permisos se validan en el API Gateway para rechazos tempranos, en cada microservicio para seguridad real del dominio y con helpers de autorizacion en frontend.
+Los permisos se validan en el API Gateway para rechazos tempranos, en cada microservicio para seguridad real del dominio y con helpers de autorización en frontend.
 
 ### Credenciales de prueba
 
@@ -279,18 +279,18 @@ El backend crea usuarios semilla para probar el panel operativo:
 
 Datos adicionales para probar flujos de cliente:
 
-| Flujo | Guia | Email asociado |
+| Flujo | Guía | Email asociado |
 | --- | --- | --- |
 | Historial de cliente con usuario existente | `ENV-DEMO-001` | `cliente@enviexpress.test` |
 | Historial de cliente con usuario existente | `ENV-DEMO-002` | `cliente@enviexpress.test` |
 | Registro de cliente sin usuario previo | `ENV-REG-001` | `registro@enviexpress.test` |
 
-Para probar registro de cliente, usar `ENV-REG-001`, confirmar `registro@enviexpress.test` y asignar una contrasena desde el formulario.
+Para probar registro de cliente, usar `ENV-REG-001`, confirmar `registro@enviexpress.test` y asignar una contraseña desde el formulario.
 
 ## Modelo de datos
 
 ```mermaid
-erDiagram
+erDíagram
     USER ||--o{ PACKAGE_STATUS_HISTORY : changes
     CLIENT ||--o{ PACKAGE : owns
     PACKAGE ||--o{ PACKAGE_STATUS_HISTORY : has
@@ -374,60 +374,60 @@ erDiagram
     }
 ```
 
-### Restricciones e indices
+### Restricciones e índices
 
-- `users.email` indice unico.
-- `clients.document` indice unico.
-- `packages.code` indice unico.
+- `users.email` índice único.
+- `clients.document` índice único.
+- `packages.code` índice único.
 - `packages.client_id` indexado para consultas por cliente.
 - `packages.current_status` indexado para filtros y dashboard.
 - `packages.city` indexado para consulta operativa.
 - `packages.created_at` indexado para filtros por rango.
-- Indice compuesto `packages.client_id, current_status, created_at` para listados frecuentes.
-- Indice compuesto `package_status_history.package_id, created_at` para trazabilidad cronologica.
-- Indice compuesto `derived_actions.status, created_at` para dashboard y reintentos.
-- `derived_actions.idempotency_key` indice unico para evitar duplicados.
-- Indice compuesto `audit_logs.resource_type, resource_id, created_at` para auditoria por entidad.
-- Indice compuesto `audit_logs.actor_user_id, created_at` para auditoria por usuario.
-- Indice `audit_logs.request_id` para correlacionar llamadas HTTP/gRPC y eventos.
-- Todos los documentos tienen `id` UUID generado por la capa de codigo con indice unico como identificador funcional.
-- `_id` de MongoDB se conserva solo como identificador tecnico interno y no se expone por API.
+- Índice compuesto `packages.client_id, current_status, created_at` para listados frecuentes.
+- Índice compuesto `package_status_history.package_id, created_at` para trazabilidad cronológica.
+- Índice compuesto `derived_actions.status, created_at` para dashboard y reintentos.
+- `derived_actions.idempotency_key` índice único para evitar duplicados.
+- Índice compuesto `audit_logs.resource_type, resource_id, created_at` para auditoría por entidad.
+- Índice compuesto `audit_logs.actor_user_id, created_at` para auditoría por usuario.
+- Índice `audit_logs.request_id` para correlacionar llamadas HTTP/gRPC y eventos.
+- Todos los documentos tienen `id` UUID generado por la capa de código con índice único como identificador funcional.
+- `_id` de MongoDB se conserva solo como identificador técnico interno y no se expone por API.
 
 ### Integridad con MongoDB
 
-MongoDB no impone llaves foraneas como una base relacional, asi que la integridad se resuelve de forma explicita en la capa de dominio y persistencia:
+MongoDB no impone llaves foraneas como una base relacional, así que la integridad se resuelve de forma explícita en la capa de dominio y persistencia:
 
-- **UUID desde codigo**: cada agregado genera su `id` con UUID v4 o UUID v7 antes de persistir. Las referencias entre colecciones usan esos UUID, no `_id`/`ObjectId` de MongoDB.
-- **Schemas estrictos con Mongoose**: campos requeridos, enums, tipos, longitudes, minimos para peso/valor declarado y timestamps obligatorios.
+- **UUID desde código**: cada agregado genera su `id` con UUID v4 o UUID v7 antes de persistir. Las referencias entre colecciones usan esos UUID, no `_id`/`ObjectId` de MongoDB.
+- **Schemás estrictos con Mongoose**: campos requeridos, enums, tipos, longitudes, mínimos para peso/valor declarado y timestamps obligatorios.
 - **DTOs validados en la entrada**: `class-validator` o Zod antes de llegar al caso de uso.
-- **Validaciones de existencia**: antes de crear un paquete se verifica que `client_id` exista y que el cliente este activo.
-- **Validaciones de referencia**: antes de registrar historial o accion derivada se verifica que el paquete exista.
-- **Indices unicos**: `email`, `document`, `code` e `idempotency_key` se protegen desde MongoDB, no solo desde codigo.
-- **Transacciones de MongoDB**: el cambio de estado, insercion de historial y creacion de accion derivada se ejecutan en una misma sesion transaccional. Para esto, local y produccion deben usar replica set, aunque localmente sea de un solo nodo.
-- **Maquina de estados dentro de `packages-ms`**: las transiciones validas pertenecen al dominio de paquetes, no dependen del controlador ni de la base de datos, y se prueban de forma aislada dentro de ese microservicio.
+- **Validaciónes de existencia**: antes de crear un paquete se verifica que `client_id` exista y que el cliente esté activo.
+- **Validaciónes de referencia**: antes de registrar historial o acción derivada se verifica que el paquete exista.
+- **Índices únicos**: `email`, `document`, `code` e `idempotency_key` se protegen desde MongoDB, no solo desde código.
+- **Transacciones de MongoDB**: el cambio de estado, inserción de historial y creación de acción derivada se ejecutan en una misma sesión transaccional. Para esto, local y producción deben usar réplica set, aunque localmente sea de un solo nodo.
+- **Maquina de estados dentro de `packages-ms`**: las transiciones válidas pertenecen al dominio de paquetes, no dependen del controlador ni de la base de datos, y se prueban de forma aislada dentro de ese microservicio.
 - **Repositorios por agregado**: los microservicios no manipulan colecciones libremente; pasan por repositorios que concentran consultas, proyecciones e invariantes.
 - **Filtros controlados**: los filtros de listado se construyen desde una whitelist de campos permitidos para evitar consultas inseguras o costosas.
-- **Normalizacion controlada**: se guardan referencias por UUID; solo se desnormalizan datos estables si mejoran lecturas operativas, por ejemplo nombre del cliente en una vista de listado.
-- **Pruebas de integracion**: cubren duplicados, cliente inactivo, paquete inexistente, transiciones invalidas e idempotencia de acciones derivadas.
+- **Normalización controlada**: se guardan referencias por UUID; solo se desnormalizan datos estables si mejoran lecturas operativas, por ejemplo nombre del cliente en una vista de listado.
+- **Pruebas de integración**: cubren duplicados, cliente inactivo, paquete inexistente, transiciones inválidas e idempotencia de acciones derivadas.
 
-## Auditoria
+## Auditoría
 
-La auditoria se maneja mediante `audit-ms`, un microservicio dedicado a crear y consultar registros de auditoria de las entidades del sistema.
+La auditoría se maneja mediante `audit-ms`, un microservicio dedicado a crear y consultar registros de auditoría de las entidades del sistema.
 
-- Cada comando sensible genera un registro de auditoria: login, creacion/edicion de usuarios, cambios de clientes, creacion de paquetes, cambios de estado, reintentos de acciones derivadas y operaciones administrativas.
-- Cada evento auditable incluye `requestId`, `actorUserId`, `actorRole`, `resourceType`, `resourceId`, `action`, `result` y `metadata` minima.
-- El API Gateway genera o propaga `requestId` y los microservicios lo conservan en llamadas gRPC, eventos Redis y registros de auditoria.
-- Los microservicios publican eventos auditables por Redis o llaman a `audit-ms` por gRPC cuando necesitan confirmacion sincrona.
-- `audit-ms` centraliza persistencia, indices y consultas de auditoria por entidad, usuario, accion, resultado y rango de fechas.
-- Los cambios de estado mantienen dos rastros: `package_status_history` para trazabilidad operativa del paquete y `audit_logs` para auditoria transversal de seguridad/operacion.
-- Los registros de auditoria son append-only desde la aplicacion; no se editan desde flujos normales.
-- Las consultas de auditoria se protegen con permisos de administrador y filtros obligatorios por fecha, usuario, recurso o accion.
+- Cada comando sensible genera un registro de auditoría: login, creación/edición de usuarios, cambios de clientes, creación de paquetes, cambios de estado, reintentos de acciones derivadas y operaciones administrativas.
+- Cada evento auditable incluye `requestId`, `actorUserId`, `actorRole`, `resourceType`, `resourceId`, `action`, `result` y `metadata` mínima.
+- El API Gateway genera o propaga `requestId` y los microservicios lo conservan en llamadas gRPC, eventos Redis y registros de auditoría.
+- Los microservicios publican eventos auditables por Redis o llaman a `audit-ms` por gRPC cuando necesitan confirmación síncrona.
+- `audit-ms` centraliza persistencia, índices y consultas de auditoría por entidad, usuario, acción, resultado y rango de fechas.
+- Los cambios de estado mantienen dos rastros: `package_status_history` para trazabilidad operativa del paquete y `audit_logs` para auditoría transversal de seguridad/operación.
+- Los registros de auditoría son append-only desde la aplicación; no se editan desde flujos normales.
+- Las consultas de auditoría se protegen con permisos de administrador y filtros obligatorios por fecha, usuario, recurso o acción.
 
 ## Estados y transiciones
 
-La regla de estados vive dentro de `packages-ms` y se implementa con el patron **maquina de estados finitos**. Cada estado conoce sus transiciones permitidas, validaciones requeridas y efectos derivados. Esto evita condicionales dispersos, facilita agregar una nueva regla en vivo y permite probar el flujo de estados como una unidad aislada.
+La regla de estados vive dentro de `packages-ms` y se implementa con el patrón **máquina de estados finitos**. Cada estado conoce sus transiciones permitidas, validaciones requeridas y efectos derivados. Esto evita condicionales dispersos, facilita agregar una nueva regla en vivo y permite probar el flujo de estados como una unidad aislada.
 
-Estados minimos:
+Estados mínimos:
 
 - `REGISTERED`
 - `PICKED_UP`
@@ -441,7 +441,7 @@ Estados minimos:
 Transiciones permitidas:
 
 ```mermaid
-stateDiagram-v2
+stateDíagram-v2
     [*] --> REGISTERED
     REGISTERED --> PICKED_UP
     REGISTERED --> CANCELLED
@@ -467,28 +467,28 @@ Reglas obligatorias:
 - Un paquete `RETURNED` no puede marcarse como `DELIVERED` directamente.
 - Para marcar `DELIVERED` se requiere `receivedBy`.
 - Para marcar `INCIDENT` se requiere `observation`.
-- Todo cambio de estado se ejecuta en transaccion de MongoDB: actualizar paquete, insertar historial y crear accion derivada.
-- El resultado de la transicion publica un evento de dominio por Redis Pub/Sub para que otros microservicios reaccionen sin bloquear la respuesta.
+- Todo cambio de estado se ejecuta en transacción de MongoDB: actualizar paquete, insertar historial y crear acción derivada.
+- El resultado de la transición publica un evento de dominio por Redis Pub/Sub para que otros microservicios reaccionen sin bloquear la respuesta.
 
 ## Procesos derivados
 
 Los cambios de estado que generan acciones:
 
-| Estado nuevo | Accion derivada | Tipo |
+| Estado nuevo | Acción derivada | Tipo |
 | --- | --- | --- |
-| `DELIVERED` | Generar registro de liquidacion | `SETTLEMENT` |
+| `DELIVERED` | Generar registro de liquidación | `SETTLEMENT` |
 | `INCIDENT` | Generar alerta operativa | `OPERATIONAL_ALERT` |
-| `RETURNED` | Generar accion pendiente de revision | `RETURN_REVIEW` |
+| `RETURNED` | Generar acción pendiente de revisión | `RETURN_REVIEW` |
 
 Flujo:
 
 1. El frontend llama al API Gateway.
-2. El API Gateway valida JWT/permisos basicos y llama por gRPC a `packages-ms`.
-3. `packages-ms` valida reglas, ejecuta la maquina de estados y guarda el cambio de estado e historial en MongoDB.
+2. El API Gateway valida JWT/permisos básicos y llama por gRPC a `packages-ms`.
+3. `packages-ms` valida reglas, ejecuta la máquina de estados y guarda el cambio de estado e historial en MongoDB.
 4. `packages-ms` crea una `derived_action` en estado `PENDING` con `idempotency_key`.
 5. `packages-ms` publica un evento Redis Pub/Sub, por ejemplo `package.status.changed`, y responde al gateway.
 6. El API Gateway responde al frontend sin esperar el procesamiento derivado.
-7. Los handlers de `derived-actions` del dominio de paquetes consumen el evento y marcan la accion como `PROCESSED` o `FAILED`.
+7. Los handlers de `derived-actions` del dominio de paquetes consumen el evento y marcan la acción como `PROCESSED` o `FAILED`.
 8. Si falla, se guarda `error_message` y `attempts` para consulta y reintento.
 
 La idempotencia se basa en:
@@ -501,28 +501,28 @@ Esto permite reintentar eventos o reprocesar acciones pendientes sin duplicar li
 
 ### Notificaciones externas
 
-No se incluyen notificaciones por correo, SMS, WhatsApp, push notifications ni avisos externos ante fallos de procesos asincronos. Para una primera entrega se consideran innecesarias por el costo y complejidad de integrar proveedores, manejar plantillas, cuotas, credenciales, reintentos externos y trazabilidad de entrega.
+No se incluyen notificaciones por correo, SMS, WhatsApp, push notifications ni avisos externos ante fallos de procesos asíncronos. Para una primera entrega se consideran innecesarias por el costo y complejidad de integrar proveedores, manejar plantillas, cuotas, credenciales, reintentos externos y trazabilidad de entrega.
 
-Los errores asincronos quedan visibles dentro del sistema mediante acciones derivadas en estado `FAILED`, auditoria, logs estructurados y metricas/alertas internas. Esa evidencia es suficiente para operar y defender la prueba tecnica sin depender de servicios pagos o configuracion externa.
+Los errores asíncronos quedan visibles dentro del sistema mediante acciones derivadas en estado `FAILED`, auditoría, logs estructurados y métricas/alertas internas. Esa evidencia es suficiente para operar y defender la prueba técnica sin depender de servicios pagos o configuración externa.
 
 ### Microservicio de estado de paquete
 
-El microservicio `package-status` expone consultas especializadas sobre estado, historial y trazabilidad. El API Gateway se comunica con este microservicio por gRPC para responder al frontend de forma sincrona.
+El microservicio `package-status` expone consultas especializadas sobre estado, historial y trazabilidad. El API Gateway se comunica con este microservicio por gRPC para responder al frontend de forma síncrona.
 
 Responsabilidades:
 
-- Consultar estado actual de un paquete por codigo o id.
+- Consultar estado actual de un paquete por código o id.
 - Consultar historial cronologico.
 - Preparar respuestas optimizadas para la pantalla de detalle.
 - Aislar consultas operativas de alto uso para poder escalar este proceso de forma independiente si crece el volumen.
 
-No ejecuta cambios de estado. Las escrituras siguen pasando por `packages-ms` para mantener transacciones, autorizacion y reglas de negocio centralizadas.
+No ejecuta cambios de estado. Las escrituras siguen pasando por `packages-ms` para mantener transacciones, autorización y reglas de negocio centralizadas.
 
 ## API esperada
 
 El frontend consume exclusivamente el API Gateway por HTTP/REST. El Gateway traduce estas peticiones a llamadas gRPC internas contra los microservicios responsables.
 
-### Autenticacion
+### Autenticación
 
 - `POST /auth/login`
 - `GET /auth/me`
@@ -548,51 +548,51 @@ El frontend consume exclusivamente el API Gateway por HTTP/REST. El Gateway trad
 - `PATCH /packages/:id/status`
 - `GET /packages/:id/history`
 
-### Acciones derivadas
+### Acciónes derivadas
 
 - `GET /derived-actions?status=&type=&page=&limit=`
 - `POST /derived-actions/:id/retry`
 
-### Auditoria
+### Auditoría
 
 - `GET /audit-logs?resourceType=&resourceId=&actorUserId=&action=&result=&from=&to=&page=&limit=`
 - `GET /audit-logs/:id`
 
-### Dashboard estadistico
+### Dashboard estadístico
 
 - `GET /dashboard/summary`
 
 ## Experiencia frontend
 
-Pantallas minimas:
+Pantallas mínimas:
 
-- Login o acceso basico.
-- Dashboard con conteo por estado, ultimos cambios y acciones pendientes/fallidas.
-- Clientes con listado, busqueda basica, creacion y edicion.
-- Paquetes con filtros, paginacion, estados de carga, vacio y error.
+- Login o acceso básico.
+- Dashboard con conteo por estado, últimos cambios y acciones pendientes/fallidas.
+- Clientes con listado, búsqueda básica, creación y edición.
+- Paquetes con filtros, paginación, estados de carga, vacío y error.
 - Crear paquete asociado a un cliente activo.
 - Detalle de paquete con datos generales, estado actual, historial y acciones disponibles.
-- Acciones derivadas con estado, tipo, intentos y error.
+- Acciónes derivadas con estado, tipo, intentos y error.
 
 Comportamientos clave:
 
-- Deshabilitar acciones segun rol y estado actual.
-- Mostrar errores de validacion del backend.
-- Actualizar listados y detalle despues de crear paquete o cambiar estado sin recargar manualmente toda la app.
-- Mantener paginacion obligatoria en consultas operativas.
+- Deshabilitar acciones según rol y estado actual.
+- Mostrar errores de validación del backend.
+- Actualizar listados y detalle después de crear paquete o cambiar estado sin recargar manualmente toda la app.
+- Mantener paginación obligatoria en consultas operativas.
 
 ## Seguridad
 
 - Passwords con hash `bcrypt` o `argon2`.
-- JWT con expiracion corta y secreto desde variables de entorno.
-- Validacion de DTOs en backend con `class-validator` o Zod.
-- Validacion de formularios en frontend con Angular Reactive Forms y validadores reutilizables.
-- Autorizacion en API Gateway y microservicios por rol/permisos.
+- JWT con expiración corta y secreto desde variables de entorno.
+- Validación de DTOs en backend con `class-validator` o Zod.
+- Validación de formularios en frontend con Angular Reactive Forms y validadores reutilizables.
+- Autorización en API Gateway y microservicios por rol/permisos.
 - Consultas mediante repositorios/Mongoose, sanitizando entrada y evitando filtros dinamicos no controlados.
-- Errores controlados con filtro global; no exponer stack traces en produccion.
+- Errores controlados con filtro global; no exponer stack traces en producción.
 - Variables sensibles solo por `.env`, nunca commiteadas.
 - CORS restringido al dominio del frontend.
-- Rate limit basico en login.
+- Rate limit básico en login.
 
 ## Variables de entorno
 
@@ -616,15 +616,15 @@ NODE_ENV=development
 
 Frontend:
 
-Con el template Angular la configuracion queda en `frontend/src/environments/*`:
+Con el template Angular la configuración queda en `frontend/src/environments/*`:
 
 ```ts
 API_BASE_URL: 'http://localhost:3000'
 ```
 
-## Ejecucion local esperada
+## Ejecución local esperada
 
-> Los comandos finales pueden ajustarse cuando se agregue el codigo fuente.
+> Los comandos finales pueden ajustarse cuando se agregue el código fuente.
 
 ```bash
 pnpm install
@@ -680,18 +680,18 @@ backend/tests/
 Los tipos de prueba se distinguen por carpeta y por sufijo:
 
 - `*.unit-spec.ts`: reglas puras, use cases, value objects, mappers y state machines con dependencias mockeadas.
-- `*.integration-spec.ts`: adaptadores contra infraestructura controlada, por ejemplo Mongo temporal, Redis de test o modulos Nest reales.
+- `*.integration-spec.ts`: adaptadores contra infraestructura controlada, por ejemplo Mongo temporal, Redis de test o módulos Nest reales.
 - `*.e2e-spec.ts`: flujos completos con gateway/microservicios cuando aplique.
 
-Pruebas minimas esperadas:
+Pruebas minimás esperadas:
 
-- Unitarias para reglas de transicion de estados.
+- Unitarias para reglas de transición de estados.
 - Unitarias para permisos por rol.
-- Integracion para creacion de paquete.
-- Integracion para cambio de estado con historial.
-- Integracion para generacion de accion derivada.
+- Integración para creación de paquete.
+- Integración para cambio de estado con historial.
+- Integración para generación de acción derivada.
 - Contratos gRPC para auth, users, clients, packages, package-status y audit.
-- Auditoria para comandos sensibles y cambios de estado.
+- Auditoría para comandos sensibles y cambios de estado.
 - Frontend Angular: pruebas de facades, mappers, validadores, pages criticas y guards/interceptores.
 
 Comando esperado:
@@ -709,7 +709,7 @@ pnpm run test:integration
 flowchart TB
     DNS[DNS] --> CDN[CDN / Static hosting]
     CDN --> FE[Frontend build]
-    DNS --> LB[Load balancer publico]
+    DNS --> LB[Load balancer público]
     LB --> GW[API Gateway privado]
     GW -->|gRPC privado| AUTH[Auth MS privado]
     GW -->|gRPC privado| USERS[Users MS privado]
@@ -735,10 +735,10 @@ flowchart TB
     PSM --> LOGS
     AUDIT --> LOGS
     PACKAGES_DERIVED --> LOGS
-    DB --> BK[Backups automaticos]
+    DB --> BK[Backups automáticos]
 ```
 
-### Red y exposicion
+### Red y exposición
 
 - Publico:
   - CDN/static hosting del frontend.
@@ -756,19 +756,19 @@ flowchart TB
   - Redis.
   - Puertos gRPC internos.
 - Acceso administrativo:
-  - Sin exposicion directa a base de datos o Redis.
+  - Sin exposición directa a base de datos o Redis.
   - Acceso por VPN, bastion o herramienta administrada con MFA.
 
 ### Despliegue recomendado
 
-Opcion cloud neutral:
+Opción cloud neutral:
 
-- Frontend en hosting estatico con CDN.
+- Frontend en hosting estático con CDN.
 - API Gateway y microservicios NestJS como containers en ECS/Fargate, Cloud Run, Azure Container Apps o Kubernetes pequeno.
 - MongoDB administrado, por ejemplo MongoDB Atlas o servicio equivalente.
 - Redis administrado.
 - Secret manager para credenciales.
-- Logs centralizados y metricas por servicio.
+- Logs centralizados y métricas por servicio.
 
 ### CI/CD
 
@@ -778,77 +778,77 @@ Pipeline por pull request:
 2. Ejecutar lint.
 3. Ejecutar pruebas.
 4. Construir backend, microservicios y frontend.
-5. Ejecutar seed o scripts de indices en ambiente controlado.
-6. Publicar imagenes Docker.
+5. Ejecutar seed o scripts de índices en ambiente controlado.
+6. Publicar imágenes Docker.
 7. Desplegar primero staging.
-8. Promocionar a produccion con aprobacion manual.
+8. Promocionar a producción con aprobación manual.
 
 ### Observabilidad
 
 - Logs estructurados con `requestId`, `userId`, `packageId` cuando aplique.
-- Metricas:
+- Métricas:
   - Latencia HTTP del API Gateway.
   - Latencia gRPC por microservicio.
   - Errores 4xx/5xx.
   - Eventos publicados y procesados.
-  - Acciones derivadas pendientes/fallidas.
+  - Acciónes derivadas pendientes/fallidas.
   - Tiempo de procesamiento de eventos.
   - Conexiones y uso de MongoDB/Redis.
 - Alertas:
   - Error rate alto.
-  - Acciones derivadas fallidas.
+  - Acciónes derivadas fallidas.
   - Microservicio sin procesar eventos.
   - Base de datos sin espacio.
   - Latencia elevada.
 
-### Backups y recuperacion
+### Backups y recuperación
 
-- MongoDB debe correr como servicio administrado o replica set con backups automatizados.
-- Backups automaticos diarios como minimo; en produccion se prefiere snapshot continuo con point-in-time recovery.
-- Retencion sugerida: 7 dias para ambientes bajos, 30 dias para produccion inicial y mayor retencion si hay requerimientos legales.
-- Backups cifrados en reposo y en transito, gestionados con llaves del proveedor o KMS.
-- Restauracion probada periodicamente en un ambiente aislado para validar que el backup es util, no solo existente.
-- Procedimiento documentado de restore: seleccionar punto de restauracion, levantar base alterna, validar integridad, apuntar servicios o migrar datos recuperados.
-- Indices versionados por script para poder reconstruir rendimiento despues de una restauracion.
-- Auditorias y trazabilidad se respaldan junto con los datos operativos; no se dependen solo de logs externos.
-- Redis no es fuente de verdad; si se pierde un evento Pub/Sub, las acciones `PENDING` en MongoDB permiten reprocesar desde un endpoint o tarea de recuperacion.
+- MongoDB debe correr como servicio administrado o réplica set con backups automatizados.
+- Backups automáticos diarios como mínimo; en producción se prefiere snapshot continuo con point-in-time recovery.
+- Retención sugerida: 7 días para ambientes bajos, 30 días para producción inicial y mayor retención si hay requerimientos legales.
+- Backups cifrados en reposo y en transito, gestiónados con llaves del proveedor o KMS.
+- Restauración probada periódicamente en un ambiente aislado para validar que el backup es útil, no solo existente.
+- Procedimiento documentado de restore: seleccionar punto de restauración, levantar base alterna, validar integridad, apuntar servicios o migrar datos recuperados.
+- Índices versionados por script para poder reconstruir rendimiento después de una restauración.
+- Auditorías y trazabilidad se respaldan junto con los datos operativos; no se dependen solo de logs externos.
+- Redis no es fuente de verdad; si se pierde un evento Pub/Sub, las acciones `PENDING` en MongoDB permiten reprocesar desde un endpoint o tarea de recuperación.
 
 ### Escalabilidad y fallos
 
 - API Gateway escala horizontalmente porque no guarda estado en memoria.
-- Los microservicios NestJS escalan de forma independiente segun lectura de estado, estadisticas propias del dominio o procesamiento de paquetes.
-- MongoDB es el principal punto de cuidado: indices, paginacion, proyecciones y control de filtros para evitar scans costosos.
-- Redis Pub/Sub puede ser reemplazado por RabbitMQ, SQS, Google Pub/Sub o Kafka si el volumen exige garantias mas fuertes de entrega.
+- Los microservicios NestJS escalan de forma independiente según lectura de estado, estadísticas propias del dominio o procesamiento de paquetes.
+- MongoDB es el principal punto de cuidado: índices, paginación, proyecciones y control de filtros para evitar scans costosos.
+- Redis Pub/Sub puede ser reemplazado por RabbitMQ, SQS, Google Pub/Sub o Kafka si el volumen exige garantías más fuertes de entrega.
 - Si un microservicio cae, la API sigue operando y las acciones quedan consultables como `PENDING`; al recuperarse, se reprocesan desde persistencia.
 
-## Plan de implementacion en 3 dias
+## Plan de implementación en 3 días
 
-### Dia 1
+### Día 1
 
 - Crear monorepo y tooling base.
-- Implementar MongoDB, schemas Mongoose, indices y seed.
+- Implementar MongoDB, schemás Mongoose, índices y seed.
 - Implementar `auth-ms`, `users-ms`, `clients-ms`, `packages-ms`, `audit-ms` y API Gateway con gRPC.
 - Implementar reglas de estado e historial.
 
-### Dia 2
+### Día 2
 
-- Implementar `package-status`, estadisticas por dominio y `derived-actions` como handlers del dominio de paquetes.
+- Implementar `package-status`, estadísticas por dominio y `derived-actions` como handlers del dominio de paquetes.
 - Implementar frontend: login, dashboard, clientes, paquetes, detalle.
-- Conectar filtros, paginacion y cambio de estado.
+- Conectar filtros, paginación y cambio de estado.
 
-### Dia 3
+### Día 3
 
 - Agregar pruebas clave.
 - Completar Swagger/OpenAPI.
 - Revisar errores, permisos y validaciones.
-- Completar documentacion, capturas y defensa tecnica.
+- Completar documentación, capturas y defensa técnica.
 
 ## Pendientes documentales
 
-Ademas de este README, la entrega final deberia incluir:
+Además de este README, la entrega final deberia incluir:
 
 - [`README_DEPLOY_AWS.md`](./README_DEPLOY_AWS.md) con la propuesta de despliegue en AWS usando ECR, ECS Fargate, ALB/API Gateway, ElastiCache Redis, MongoDB Atlas y VPC privada.
 - `DECISIONS.md` con trade-offs, alternativas descartadas y mejoras futuras.
-- Diagrama actualizado si la implementacion cambia.
-- Coleccion de peticiones o Swagger exportado.
+- Díagrama actualizado si la implementación cambia.
+- Colección de peticiones o Swagger exportado.
 - Capturas o video corto del flujo funcionando.

@@ -35,7 +35,7 @@ export class ClientRegisterPageComponent {
         void this.router.navigateByUrl('/client/packages');
       },
       error: () => {
-        this.errorMessage.set('No se pudo validar la guia con ese correo');
+        this.errorMessage.set('No se pudo validar la guía con ese correo');
       },
     });
   }

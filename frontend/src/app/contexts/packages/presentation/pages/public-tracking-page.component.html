@@ -1,9 +1,9 @@
 <main class="tracking-page">
   <section class="tracking-form">
-    <p class="eyebrow">Rastreo publico</p>
+    <p class="eyebrow">Rastreo público</p>
     <h1>Consulta tu pedido</h1>
     <form [formGroup]="form" (ngSubmit)="track()">
-      <label>Numero de guia <input formControlName="trackingCode" /></label>
+      <label>Número de guía <input formControlName="trackingCode" /></label>
       <label>Correo asociado <input formControlName="email" /></label>
       <button type="submit" [disabled]="form.invalid || isTracking()">
         {{ isTracking() ? 'Consultando...' : 'Rastrear' }}
@@ -17,7 +17,7 @@
     <div class="status-header">
       <div>
         <p class="eyebrow">Estado actual</p>
-        <h2>{{ currentPackage.status }}</h2>
+        <h2>{{ statusNames[currentPackage.status] || currentPackage.status }}</h2>
       </div>
       <span>{{ currentPackage.trackingCode }}</span>
     </div>
@@ -34,7 +34,7 @@
         <li *ngFor="let history of currentPackage.history">
           <span class="dot"></span>
           <div>
-            <strong>{{ history.status }}</strong>
+            <strong>{{ statusNames[history.status] || history.status }}</strong>
             <time>{{ formatDateTime(history.changedAt) }}</time>
             <p *ngIf="history.comment">{{ history.comment }}</p>
           </div>

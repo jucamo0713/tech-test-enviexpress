@@ -3,8 +3,8 @@
   <form [formGroup]="form" (ngSubmit)="submit()">
     <input placeholder="Nombre" formControlName="name" />
     <input placeholder="Email" formControlName="email" />
-    <input placeholder="Telefono" formControlName="phone" />
-    <input placeholder="Direccion" formControlName="address" />
+    <input placeholder="Teléfono" formControlName="phone" />
+    <input placeholder="Dirección" formControlName="address" />
     <button type="submit" [disabled]="form.invalid">Crear cliente</button>
   </form>
   <div class="list">

@@ -4,6 +4,7 @@ import { provideRouter } from '@angular/router';
 import { provideEffects } from '@ngrx/effects';
 import { provideStore } from '@ngrx/store';
 import { provideStoreDevtools } from '@ngrx/store-devtools';
+import { provideCharts, withDefaultRegisterables } from 'ng2-charts';
 
 import { routes } from './app.routes';
 import { APP_CONFIG, appConfigFromEnvironment } from './core/config';
@@ -38,6 +39,7 @@ export const appConfig: ApplicationConfig = {
       ]),
     ),
     provideStore(appReducers),
+    provideCharts(withDefaultRegisterables()),
     provideEffects([AppEffects]),
     provideStoreDevtools({
       maxAge: 25,

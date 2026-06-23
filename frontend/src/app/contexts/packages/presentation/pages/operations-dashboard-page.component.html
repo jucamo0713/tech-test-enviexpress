@@ -2,7 +2,7 @@
   <section class="topbar">
     <div>
       <p class="eyebrow">Enviexpress</p>
-      <h1>Operacion de paquetes</h1>
+      <h1>Operación de paquetes</h1>
     </div>
     <div class="session" *ngIf="user() as currentUser">
       <span>{{ currentUser.name }} · {{ currentUser.role }}</span>
@@ -10,8 +10,8 @@
       <a *ngIf="isAdmin()" routerLink="/clients">Clientes</a>
       <a *ngIf="isAdmin()" routerLink="/operators">Operadores</a>
       <a routerLink="/profile">Perfil</a>
-      <button type="button" (click)="refresh()">Refresh</button>
-      <button type="button" class="ghost" (click)="logout()">Cerrar sesion</button>
+      <button type="button" (click)="refresh()">Actualizar</button>
+      <button type="button" class="ghost" (click)="logout()">Cerrar sesión</button>
     </div>
   </section>
 
@@ -30,6 +30,7 @@
       [selectedPackage]="selectedPackage()"
       [streamMessage]="streamMessage()"
       (updateStatus)="updateStatus($event)"
+      (close)="closePackage()"
     />
   </section>
 </main>

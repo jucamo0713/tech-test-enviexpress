@@ -41,6 +41,10 @@ export class RedisPubSubClient implements OnApplicationShutdown {
     return value ? (JSON.parse(value) as T) : null;
   }
 
+  async delete(key: string): Promise<void> {
+    await this.getPublisher().del(key);
+  }
+
   async setJson(key: string, value: unknown, ttlSeconds?: number): Promise<void> {
     const serialized = JSON.stringify(value);
     if (ttlSeconds) {

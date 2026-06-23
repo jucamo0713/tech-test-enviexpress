@@ -23,7 +23,7 @@ export class EnsureDefaultPackagesUseCase {
       id: '44444444-4444-4444-8444-444444444444',
       trackingCode: 'ENV-DEMO-002',
       clientId: SEEDED_CLIENT_ID,
-      description: 'Caja pequena de repuestos',
+      description: 'Caja pequeña de repuestos',
       destinationAddress: 'Avenida 7 # 45-12, Cali',
       status: 'in_transit',
       comment: 'Paquete demo en transito',

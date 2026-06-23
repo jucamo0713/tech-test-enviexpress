@@ -39,17 +39,17 @@
     </form>
 
     <form class="panel" [formGroup]="passwordForm" (ngSubmit)="changePassword()">
-      <h2>Cambiar contrasena</h2>
+      <h2>Cambiar contraseña</h2>
       <label>
-        Contrasena actual
+        Contraseña actual
         <input type="password" formControlName="currentPassword" autocomplete="current-password" />
       </label>
       <label>
-        Nueva contrasena
+        Nueva contraseña
         <input type="password" formControlName="newPassword" autocomplete="new-password" />
       </label>
       <button type="submit" [disabled]="isChangingPassword()">
-        {{ isChangingPassword() ? 'Actualizando...' : 'Cambiar contrasena' }}
+        {{ isChangingPassword() ? 'Actualizando...' : 'Cambiar contraseña' }}
       </button>
     </form>
   </section>

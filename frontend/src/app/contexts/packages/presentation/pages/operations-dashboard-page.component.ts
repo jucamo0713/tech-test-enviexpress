@@ -35,7 +35,7 @@ export class OperationsDashboardPageComponent implements OnInit, OnDestroy {
   readonly user = this.session.user;
   readonly packages = signal<PackageItem[]>([]);
   readonly selectedPackage = signal<PackageItem | undefined>(undefined);
-  readonly streamMessage = signal('Sin conexion SSE');
+  readonly streamMessage = signal('Sin conexión SSE');
   readonly filters = signal<PackageListFilters>({});
 
   ngOnInit(): void {
@@ -110,16 +110,23 @@ export class OperationsDashboardPageComponent implements OnInit, OnDestroy {
       this.packagesApi.statusStreamUrl(packageItem.id, accessToken),
     );
     this.eventSource.addEventListener('package-status', (event) => {
-      const payload = JSON.parse(event.data) as { package: PackageItem; heartbeat: string };
-      this.selectedPackage.set(payload.package);
+      const payload = JSON.parse(event.data) as { package: Partial<PackageItem>; heartbeat: string };
+      this.selectedPackage.update((current) => current ? { ...current, ...payload.package } : current);
       this.packages.update((packages) =>
-        packages.map((item) => item.id === payload.package.id ? payload.package : item),
+        packages.map((item) =>
+          item.id === payload.package.id ? { ...item, ...payload.package } : item,
+        ),
       );
       this.streamMessage.set(`Actualizado ${this.formatDateTime(payload.heartbeat)}`);
     });
     this.eventSource.onerror = () => {
       this.streamMessage.set('Reconectando SSE...');
     };
+  }
+
+  closePackage(): void {
+    this.selectedPackage.set(undefined);
+    this.eventSource?.close();
   }
 
   updateStatus(request: UpdatePackageStatusRequest): void {

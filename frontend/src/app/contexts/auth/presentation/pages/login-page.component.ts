@@ -37,7 +37,7 @@ export class LoginPageComponent {
         );
       },
       error: () => {
-        this.errorMessage.set('No se pudo iniciar sesion');
+        this.errorMessage.set('No se pudo iniciar sesión');
       },
     });
   }

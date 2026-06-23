@@ -76,11 +76,11 @@ export class ProfilePageComponent implements OnInit {
       next: (profile) => {
         this.applyProfile(profile);
         this.passwordForm.reset();
-        this.message.set('Contrasena actualizada');
+        this.message.set('Contraseña actualizada');
         this.isChangingPassword.set(false);
       },
       error: () => {
-        this.errorMessage.set('No se pudo cambiar la contrasena');
+        this.errorMessage.set('No se pudo cambiar la contraseña');
         this.isChangingPassword.set(false);
       },
     });

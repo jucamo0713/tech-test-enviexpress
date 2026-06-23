@@ -1,8 +1,8 @@
 import { CommonModule } from '@angular/common';
-import { Component, OnDestroy, inject, signal } from '@angular/core';
+import { Component, OnDestroy, OnInit, inject, signal } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
-import { RouterLink } from '@angular/router';
-import { PackageItem } from '../../domain/models/package.model';
+import { ActivatedRoute, RouterLink } from '@angular/router';
+import { PackageItem, PACKAGE_STATUS_NAMES } from '../../domain/models/package.model';
 import { PackagesApiService } from '../../infrastructure/api/packages-api.service';
 
 @Component({
@@ -11,12 +11,14 @@ import { PackagesApiService } from '../../infrastructure/api/packages-api.servic
   templateUrl: './public-tracking-page.component.html',
   styleUrl: './public-tracking-page.component.css',
 })
-export class PublicTrackingPageComponent implements OnDestroy {
+export class PublicTrackingPageComponent implements OnInit, OnDestroy {
   private readonly fb = inject(FormBuilder);
+  private readonly route = inject(ActivatedRoute);
   private readonly packagesApi = inject(PackagesApiService);
   private eventSource?: EventSource;
 
   readonly packageStatus = signal<PackageItem | undefined>(undefined);
+  readonly statusNames = PACKAGE_STATUS_NAMES;
   readonly streamMessage = signal('');
   readonly errorMessage = signal('');
   readonly isTracking = signal(false);
@@ -25,6 +27,14 @@ export class PublicTrackingPageComponent implements OnDestroy {
     trackingCode: ['', [Validators.required]],
     email: ['', [Validators.required, Validators.email]],
   });
+
+  ngOnInit(): void {
+    const { trackingCode, email } = this.route.snapshot.queryParams;
+    if (trackingCode && email) {
+      this.form.patchValue({ trackingCode, email });
+      this.track();
+    }
+  }
 
   ngOnDestroy(): void {
     this.eventSource?.close();
@@ -46,7 +56,7 @@ export class PublicTrackingPageComponent implements OnDestroy {
         this.isTracking.set(false);
       },
       error: () => {
-        this.errorMessage.set('No se pudo validar la guia con ese correo');
+        this.errorMessage.set('No se pudo validar la guía con ese correo');
         this.streamMessage.set('');
         this.isTracking.set(false);
       },
@@ -59,8 +69,8 @@ export class PublicTrackingPageComponent implements OnDestroy {
     );
 
     this.eventSource.addEventListener('package-status', (event) => {
-      const payload = JSON.parse(event.data) as { package: PackageItem; heartbeat: string };
-      this.packageStatus.set(payload.package);
+      const payload = JSON.parse(event.data) as { package: Partial<PackageItem>; heartbeat: string };
+      this.packageStatus.update((current) => (current ? { ...current, ...payload.package } : current));
       this.streamMessage.set(`Actualizado ${this.formatDateTime(payload.heartbeat)}`);
       this.errorMessage.set('');
     });
@@ -69,7 +79,7 @@ export class PublicTrackingPageComponent implements OnDestroy {
       this.errorMessage.set(
         this.packageStatus()
           ? 'Reconectando el seguimiento...'
-          : 'No se pudo validar la guia con ese correo',
+          : 'No se pudo validar la guía con ese correo',
       );
     };
   }

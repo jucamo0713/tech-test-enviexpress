@@ -48,3 +48,13 @@ export interface UpdatePackageRequest {
   description?: string;
   destinationAddress?: string;
 }
+
+export const PACKAGE_STATUS_NAMES: Record<string, string> = {
+  created: 'Creado',
+  received: 'Recibido',
+  in_transit: 'En tránsito',
+  failed_delivery: 'Entrega fallida',
+  delivered: 'Entregado',
+  returned: 'Devuelto',
+  cancelled: 'Cancelado',
+};

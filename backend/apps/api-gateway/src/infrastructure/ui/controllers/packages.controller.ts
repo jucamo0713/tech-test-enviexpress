@@ -14,6 +14,7 @@ import {
   Sse,
   UseGuards,
 } from '@nestjs/common';
+import { CancelTimeoutDecorator } from '@shared/infrastructure/driven-adapters/nestjs/interceptors/timeout/timeout.decorators';
 import { CommandBus, QueryBus } from '@nestjs/cqrs';
 import type { Request } from 'express';
 import { Observable } from 'rxjs';
@@ -123,6 +124,7 @@ export class PackagesController {
   }
 
   @Sse('track/status-stream')
+  @CancelTimeoutDecorator()
   async publicStatusStream(
     @Query('trackingCode') trackingCode?: string,
     @Query('email') email?: string,
@@ -190,6 +192,7 @@ export class PackagesController {
   @Sse(':id/status-stream')
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles('admin', 'operator', 'client')
+  @CancelTimeoutDecorator()
   async statusStream(
     @Param('id') id: string,
     @Req() req: AuthenticatedRequest,

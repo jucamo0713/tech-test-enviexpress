@@ -3,7 +3,7 @@ import { Component, OnInit, inject, signal } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { AuthSessionService } from '../../../auth/application/services/auth-session.service';
-import { PackageItem, PackageListFilters } from '../../domain/models/package.model';
+import { PackageItem, PackageListFilters, PACKAGE_STATUS_NAMES } from '../../domain/models/package.model';
 import { PackagesApiService } from '../../infrastructure/api/packages-api.service';
 
 @Component({
@@ -28,6 +28,7 @@ export class ClientPackagesPageComponent implements OnInit {
   readonly isLoading = signal(false);
   readonly hasLoaded = signal(false);
   readonly filters = signal<PackageListFilters>({});
+  readonly statusNames = PACKAGE_STATUS_NAMES;
   readonly statusOptions = [
     'created',
     'received',
@@ -76,6 +77,10 @@ export class ClientPackagesPageComponent implements OnInit {
     this.filters.set({});
     this.page.set(1);
     this.loadPackages();
+  }
+
+  copyToClipboard(text: string): void {
+    void navigator.clipboard.writeText(text);
   }
 
   private loadPackages(): void {

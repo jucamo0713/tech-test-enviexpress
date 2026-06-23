@@ -114,6 +114,17 @@ button:disabled {
   font-weight: 700;
 }
 
+.copy-icon {
+  color: #64748b;
+  cursor: pointer;
+  font-size: 14px;
+  margin-left: 6px;
+}
+
+.copy-icon:hover {
+  color: #0f766e;
+}
+
 .row-actions {
   align-items: center;
   display: flex;

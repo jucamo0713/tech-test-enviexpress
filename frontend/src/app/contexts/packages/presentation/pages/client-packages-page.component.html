@@ -5,9 +5,9 @@
       <h1>Mis pedidos</h1>
     </div>
     <div class="actions">
-      <a routerLink="/track">Rastrear guia</a>
+      <a routerLink="/track">Rastrear guía</a>
       <a routerLink="/profile">Perfil</a>
-      <button type="button" (click)="logout()">Cerrar sesion</button>
+      <button type="button" (click)="logout()">Cerrar sesión</button>
     </div>
   </section>
 
@@ -16,7 +16,9 @@
   <form class="filters" [formGroup]="filtersForm" (ngSubmit)="applyFilters()">
     <select formControlName="status">
       <option value="">Todos los estados</option>
-      <option *ngFor="let status of statusOptions" [value]="status">{{ status }}</option>
+      <option *ngFor="let status of statusOptions" [value]="status">
+        {{ statusNames[status] || status }}
+      </option>
     </select>
     <input type="date" formControlName="startDate" />
     <input type="date" formControlName="endDate" />
@@ -33,15 +35,25 @@
 
   <section class="packages">
     <article class="package-card" *ngFor="let item of packages()">
-      <div>
-        <p class="tracking">{{ item.trackingCode }}</p>
-        <h2>{{ item.status }}</h2>
+      <div class="package-header">
+        <div>
+          <p class="tracking">
+            {{ item.trackingCode }}
+            <button type="button" class="icon-btn" (click)="copyToClipboard(item.trackingCode)" title="Copiar guía">
+              📋
+            </button>
+          </p>
+          <h2>{{ statusNames[item.status] || item.status }}</h2>
+        </div>
+        <a [routerLink]="['/track']" [queryParams]="{ trackingCode: item.trackingCode, email: user()?.email }" class="track-link">
+          Ver rastreo
+        </a>
       </div>
       <p>{{ item.description }}</p>
       <p>{{ item.destinationAddress }}</p>
       <ol>
         <li *ngFor="let history of item.history">
-          <span>{{ history.status }}</span>
+          <span>{{ statusNames[history.status] || history.status }}</span>
           <small>{{ history.changedAt }}</small>
         </li>
       </ol>
@@ -52,7 +64,7 @@
     <button type="button" (click)="previousPage()" [disabled]="page() <= 1">
       Anterior
     </button>
-    <span>Pagina {{ page() }} de {{ totalPages() }}</span>
+    <span>Página {{ page() }} de {{ totalPages() }}</span>
     <button type="button" (click)="nextPage()" [disabled]="page() >= totalPages()">
       Siguiente
     </button>

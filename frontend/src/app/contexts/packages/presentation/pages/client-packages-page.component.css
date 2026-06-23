@@ -108,6 +108,37 @@ p {
   padding: 18px;
 }
 
+.package-header {
+  align-items: flex-start;
+  display: flex;
+  justify-content: space-between;
+}
+
+.icon-btn {
+  background: transparent;
+  border: 0;
+  color: #64748b;
+  cursor: pointer;
+  padding: 0 4px;
+}
+
+.icon-btn:hover {
+  color: #0f766e;
+}
+
+.track-link {
+  background: #0f766e;
+  border-radius: 6px;
+  color: white;
+  font-size: 14px;
+  padding: 6px 12px;
+  text-decoration: none;
+}
+
+.track-link:hover {
+  background: #0d9488;
+}
+
 ol {
   display: grid;
   gap: 8px;

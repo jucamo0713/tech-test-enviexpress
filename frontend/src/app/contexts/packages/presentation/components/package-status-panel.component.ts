@@ -4,6 +4,7 @@ import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import {
   PackageItem,
   UpdatePackageStatusRequest,
+  PACKAGE_STATUS_NAMES,
 } from '../../domain/models/package.model';
 
 @Component({
@@ -16,8 +17,11 @@ export class PackageStatusPanelComponent implements OnChanges {
   private readonly fb = inject(FormBuilder);
 
   @Input() selectedPackage?: PackageItem;
-  @Input({ required: true }) streamMessage = 'Sin conexion SSE';
+  @Input({ required: true }) streamMessage = 'Sin conexión SSE';
   @Output() updateStatus = new EventEmitter<UpdatePackageStatusRequest>();
+  @Output() close = new EventEmitter<void>();
+
+  readonly statusNames = PACKAGE_STATUS_NAMES;
 
   private readonly transitions: Record<string, string[]> = {
     created: ['received', 'cancelled'],

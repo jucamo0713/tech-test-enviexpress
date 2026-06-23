@@ -2,6 +2,8 @@ import { CommonModule } from '@angular/common';
 import { Component, OnInit, computed, inject, signal } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
+import { ChartData, ChartOptions } from 'chart.js';
+import { BaseChartDirective } from 'ng2-charts';
 import { AuthSessionService } from '../../../auth/application/services/auth-session.service';
 import {
   DashboardPeriod,
@@ -22,7 +24,7 @@ const STATUS_COLORS: Record<string, string> = {
 
 @Component({
   selector: 'app-admin-dashboard-page',
-  imports: [CommonModule, ReactiveFormsModule, RouterLink],
+  imports: [CommonModule, ReactiveFormsModule, RouterLink, BaseChartDirective],
   templateUrl: './admin-dashboard-page.component.html',
   styleUrl: './admin-dashboard-page.component.css',
 })
@@ -41,26 +43,45 @@ export class AdminDashboardPageComponent implements OnInit {
     date: [new Date().toISOString().slice(0, 10)],
   });
 
-  readonly slices = computed(() => {
+  readonly chartData = computed<ChartData<'doughnut'>>(() => {
     const stats = this.stats();
-    if (!stats?.total) return [];
+    const items = stats?.items.filter((item) => item.total > 0) ?? [];
 
-    let accumulated = 0;
-    return stats.items
-      .filter((item) => item.total > 0)
-      .map((item) => {
-        const start = accumulated / stats.total;
-        accumulated += item.total;
-        const end = accumulated / stats.total;
-
-        return {
-          ...item,
-          color: this.colorFor(item.status),
-          path: this.describeArc(50, 50, 38, start * 360, end * 360),
-          percentage: Math.round((item.total / stats.total) * 100),
-        };
-      });
+    return {
+      labels: items.map((item) => item.status),
+      datasets: [
+        {
+          data: items.map((item) => item.total),
+          backgroundColor: items.map((item) => this.colorFor(item.status)),
+          borderColor: '#ffffff',
+          borderWidth: 3,
+          hoverOffset: 6,
+        },
+      ],
+    };
   });
+
+  readonly chartOptions: ChartOptions<'doughnut'> = {
+    responsive: true,
+    maintainAspectRatio: false,
+    cutout: '62%',
+    plugins: {
+      legend: {
+        display: false,
+      },
+      tooltip: {
+        callbacks: {
+          label: (context) => {
+            const label = context.label || 'estado';
+            const value = Number(context.parsed || 0);
+            const total = this.stats()?.total ?? 0;
+            const percentage = total ? Math.round((value / total) * 100) : 0;
+            return `${label}: ${value} (${percentage}%)`;
+          },
+        },
+      },
+    },
+  };
 
   ngOnInit(): void {
     const user = this.session.user();
@@ -109,44 +130,4 @@ export class AdminDashboardPageComponent implements OnInit {
     }).format(new Date(value));
   }
 
-  private describeArc(
-    centerX: number,
-    centerY: number,
-    radius: number,
-    startAngle: number,
-    endAngle: number,
-  ): string {
-    if (endAngle - startAngle >= 360) {
-      return [
-        `M ${centerX} ${centerY - radius}`,
-        `A ${radius} ${radius} 0 1 1 ${centerX - 0.01} ${centerY - radius}`,
-        `A ${radius} ${radius} 0 1 1 ${centerX} ${centerY - radius}`,
-      ].join(' ');
-    }
-
-    const start = this.polarToCartesian(centerX, centerY, radius, endAngle);
-    const end = this.polarToCartesian(centerX, centerY, radius, startAngle);
-    const largeArcFlag = endAngle - startAngle <= 180 ? 0 : 1;
-
-    return [
-      `M ${centerX} ${centerY}`,
-      `L ${start.x} ${start.y}`,
-      `A ${radius} ${radius} 0 ${largeArcFlag} 0 ${end.x} ${end.y}`,
-      'Z',
-    ].join(' ');
-  }
-
-  private polarToCartesian(
-    centerX: number,
-    centerY: number,
-    radius: number,
-    angleInDegrees: number,
-  ) {
-    const angleInRadians = ((angleInDegrees - 90) * Math.PI) / 180;
-
-    return {
-      x: centerX + radius * Math.cos(angleInRadians),
-      y: centerY + radius * Math.sin(angleInRadians),
-    };
-  }
 }

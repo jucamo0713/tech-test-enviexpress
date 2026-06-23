@@ -41,17 +41,17 @@
       <h2>Paquetes por estado</h2>
       <div class="chart-layout">
         <div class="pie-wrap">
-          <svg viewBox="0 0 100 100" role="img" aria-label="Grafico de estados">
-            <circle cx="50" cy="50" r="38" fill="#e2e8f0" *ngIf="!currentStats.total" />
-            <path
-              *ngFor="let slice of slices()"
-              [attr.d]="slice.path"
-              [attr.fill]="slice.color"
-            />
-            <circle cx="50" cy="50" r="20" fill="white" />
-            <text x="50" y="48" text-anchor="middle">{{ currentStats.total }}</text>
-            <text x="50" y="58" text-anchor="middle">total</text>
-          </svg>
+          <canvas
+            baseChart
+            type="doughnut"
+            [data]="chartData()"
+            [options]="chartOptions"
+            aria-label="Gráfico de estados"
+          ></canvas>
+          <div class="chart-total">
+            <strong>{{ currentStats.total }}</strong>
+            <span>total</span>
+          </div>
         </div>
 
         <div class="legend">

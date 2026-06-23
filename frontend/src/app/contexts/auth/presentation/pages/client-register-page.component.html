@@ -1,0 +1,12 @@
+<main class="auth-page">
+  <form [formGroup]="form" (ngSubmit)="register()">
+    <p class="eyebrow">Registro de cliente</p>
+    <h1>Activa tu acceso</h1>
+    <label>Numero de guia <input formControlName="trackingCode" /></label>
+    <label>Correo asociado <input formControlName="email" /></label>
+    <label>Contrasena <input type="password" formControlName="password" /></label>
+    <button type="submit" [disabled]="form.invalid">Crear acceso</button>
+    <a routerLink="/">Volver al inicio</a>
+    <p class="error" *ngIf="errorMessage">{{ errorMessage }}</p>
+  </form>
+</main>

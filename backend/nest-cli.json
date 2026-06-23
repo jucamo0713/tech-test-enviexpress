@@ -1,0 +1,87 @@
+{
+  "$schema": "https://json.schemastore.org/nest-cli",
+  "collection": "@nestjs/schematics",
+  "prefix": "app",
+  "sourceRoot": "apps/api-gateway/src",
+  "compilerOptions": {
+    "deleteOutDir": true,
+    "webpack": true,
+    "tsConfigPath": "apps/api-gateway/tsconfig.app.json"
+  },
+  "monorepo": true,
+  "root": "apps/api-gateway",
+  "projects": {
+    "api-gateway": {
+      "type": "application",
+      "root": "apps/api-gateway",
+      "entryFile": "main",
+      "sourceRoot": "apps/api-gateway/src",
+      "compilerOptions": {
+        "tsConfigPath": "apps/api-gateway/tsconfig.app.json"
+      }
+    },
+    "audit-ms": {
+      "type": "application",
+      "root": "apps/audit-ms",
+      "entryFile": "main",
+      "sourceRoot": "apps/audit-ms/src",
+      "compilerOptions": {
+        "tsConfigPath": "apps/audit-ms/tsconfig.app.json"
+      }
+    },
+    "auth-ms": {
+      "type": "application",
+      "root": "apps/auth-ms",
+      "entryFile": "main",
+      "sourceRoot": "apps/auth-ms/src",
+      "compilerOptions": {
+        "tsConfigPath": "apps/auth-ms/tsconfig.app.json"
+      }
+    },
+    "clients-ms": {
+      "type": "application",
+      "root": "apps/clients-ms",
+      "entryFile": "main",
+      "sourceRoot": "apps/clients-ms/src",
+      "compilerOptions": {
+        "tsConfigPath": "apps/clients-ms/tsconfig.app.json"
+      }
+    },
+    "package-status-ms": {
+      "type": "application",
+      "root": "apps/package-status-ms",
+      "entryFile": "main",
+      "sourceRoot": "apps/package-status-ms/src",
+      "compilerOptions": {
+        "tsConfigPath": "apps/package-status-ms/tsconfig.app.json"
+      }
+    },
+    "packages-ms": {
+      "type": "application",
+      "root": "apps/packages-ms",
+      "entryFile": "main",
+      "sourceRoot": "apps/packages-ms/src",
+      "compilerOptions": {
+        "tsConfigPath": "apps/packages-ms/tsconfig.app.json"
+      }
+    },
+    "shared": {
+      "type": "library",
+      "root": "libs/shared",
+      "entryFile": "index",
+      "sourceRoot": "libs/shared/src",
+      "compilerOptions": {
+        "tsConfigPath": "libs/shared/tsconfig.lib.json"
+      }
+    },
+    "users-ms": {
+      "type": "application",
+      "root": "apps/users-ms",
+      "entryFile": "main",
+      "sourceRoot": "apps/users-ms/src",
+      "compilerOptions": {
+        "tsConfigPath": "apps/users-ms/tsconfig.app.json"
+      }
+    }
+  }
+}

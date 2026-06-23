@@ -1,0 +1,42 @@
+syntax = "proto3";
+
+package users;
+
+service UsersService {
+  rpc Health (HealthRequest) returns (HealthResponse);
+  rpc GetUserByEmail (GetUserByEmailRequest) returns (UserResponse);
+  rpc GetUserById (GetUserByIdRequest) returns (UserResponse);
+  rpc CreateClientUser (CreateClientUserRequest) returns (UserResponse);
+}
+
+message HealthRequest {}
+
+message HealthResponse {
+  string status = 1;
+}
+
+message GetUserByEmailRequest {
+  string email = 1;
+}
+
+message GetUserByIdRequest {
+  string id = 1;
+}
+
+message UserResponse {
+  string id = 1;
+  string email = 2;
+  string passwordHash = 3;
+  string name = 4;
+  string role = 5;
+  string createdAt = 6;
+  string updatedAt = 7;
+  optional string clientId = 8;
+}
+
+message CreateClientUserRequest {
+  string email = 1;
+  string passwordHash = 2;
+  string name = 3;
+  string clientId = 4;
+}

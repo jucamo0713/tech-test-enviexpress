@@ -1,0 +1,45 @@
+<main class="tracking-page">
+  <section class="tracking-form">
+    <p class="eyebrow">Rastreo publico</p>
+    <h1>Consulta tu pedido</h1>
+    <form [formGroup]="form" (ngSubmit)="track()">
+      <label>Numero de guia <input formControlName="trackingCode" /></label>
+      <label>Correo asociado <input formControlName="email" /></label>
+      <button type="submit" [disabled]="form.invalid || isTracking">
+        {{ isTracking ? 'Consultando...' : 'Rastrear' }}
+      </button>
+    </form>
+    <a routerLink="/">Volver al inicio</a>
+    <p class="error" *ngIf="errorMessage">{{ errorMessage }}</p>
+  </section>
+
+  <section class="result" *ngIf="packageStatus">
+    <div class="status-header">
+      <div>
+        <p class="eyebrow">Estado actual</p>
+        <h2>{{ packageStatus.status }}</h2>
+      </div>
+      <span>{{ packageStatus.trackingCode }}</span>
+    </div>
+
+    <div class="package-summary">
+      <p>{{ packageStatus.description }}</p>
+      <small>{{ packageStatus.destinationAddress }}</small>
+      <small>{{ streamMessage }}</small>
+    </div>
+
+    <div class="timeline">
+      <p class="eyebrow">Tracking</p>
+      <ol>
+        <li *ngFor="let history of packageStatus.history">
+          <span class="dot"></span>
+          <div>
+            <strong>{{ history.status }}</strong>
+            <time>{{ formatDateTime(history.changedAt) }}</time>
+            <p *ngIf="history.comment">{{ history.comment }}</p>
+          </div>
+        </li>
+      </ol>
+    </div>
+  </section>
+</main>

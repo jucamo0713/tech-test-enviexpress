@@ -1,0 +1,45 @@
+<main class="client-page">
+  <section class="topbar">
+    <div>
+      <p class="eyebrow">Panel de cliente</p>
+      <h1>Mis pedidos</h1>
+    </div>
+    <div class="actions">
+      <a routerLink="/track">Rastrear guia</a>
+      <button type="button" (click)="logout()">Cerrar sesion</button>
+    </div>
+  </section>
+
+  <p class="error" *ngIf="errorMessage()">{{ errorMessage() }}</p>
+  <p class="empty" *ngIf="isLoading()">Cargando pedidos...</p>
+  <p class="empty" *ngIf="!isLoading() && hasLoaded() && !errorMessage() && packages().length === 0">
+    No tienes pedidos registrados.
+  </p>
+
+  <section class="packages">
+    <article class="package-card" *ngFor="let item of packages()">
+      <div>
+        <p class="tracking">{{ item.trackingCode }}</p>
+        <h2>{{ item.status }}</h2>
+      </div>
+      <p>{{ item.description }}</p>
+      <p>{{ item.destinationAddress }}</p>
+      <ol>
+        <li *ngFor="let history of item.history">
+          <span>{{ history.status }}</span>
+          <small>{{ history.changedAt }}</small>
+        </li>
+      </ol>
+    </article>
+  </section>
+
+  <nav class="pagination" *ngIf="total() > limit()">
+    <button type="button" (click)="previousPage()" [disabled]="page() <= 1">
+      Anterior
+    </button>
+    <span>Pagina {{ page() }} de {{ totalPages() }}</span>
+    <button type="button" (click)="nextPage()" [disabled]="page() >= totalPages()">
+      Siguiente
+    </button>
+  </nav>
+</main>

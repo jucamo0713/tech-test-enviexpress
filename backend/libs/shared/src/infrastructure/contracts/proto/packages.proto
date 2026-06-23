@@ -1,0 +1,102 @@
+syntax = "proto3";
+
+package packages;
+
+service PackagesService {
+  rpc Health (HealthRequest) returns (HealthResponse);
+  rpc ListPackages (ListPackagesRequest) returns (ListPackagesResponse);
+  rpc ListPackagesByClient (ListPackagesByClientRequest) returns (ListPackagesResponse);
+  rpc GetPackage (GetPackageRequest) returns (PackageResponse);
+  rpc GetPackageByTrackingCode (GetPackageByTrackingCodeRequest) returns (PackageResponse);
+  rpc CreatePackage (CreatePackageRequest) returns (PackageResponse);
+  rpc UpdatePackage (UpdatePackageRequest) returns (PackageResponse);
+  rpc UpdatePackageStatus (UpdatePackageStatusRequest) returns (PackageResponse);
+  rpc DeletePackage (DeletePackageRequest) returns (DeletePackageResponse);
+}
+
+message HealthRequest {}
+
+message HealthResponse {
+  string status = 1;
+}
+
+message ListPackagesRequest {
+  int32 page = 1;
+  int32 limit = 2;
+  optional string status = 3;
+  optional string startDate = 4;
+  optional string endDate = 5;
+}
+
+message GetPackageRequest {
+  string id = 1;
+}
+
+message GetPackageByTrackingCodeRequest {
+  string trackingCode = 1;
+}
+
+message ListPackagesByClientRequest {
+  string clientId = 1;
+  int32 page = 2;
+  int32 limit = 3;
+  optional string status = 4;
+  optional string startDate = 5;
+  optional string endDate = 6;
+}
+
+message CreatePackageRequest {
+  string clientId = 1;
+  string description = 2;
+  string destinationAddress = 3;
+  string changedBy = 4;
+}
+
+message UpdatePackageRequest {
+  string id = 1;
+  optional string description = 2;
+  optional string destinationAddress = 3;
+}
+
+message UpdatePackageStatusRequest {
+  string id = 1;
+  string status = 2;
+  string changedBy = 3;
+  optional string comment = 4;
+}
+
+message DeletePackageRequest {
+  string id = 1;
+}
+
+message DeletePackageResponse {
+  bool deleted = 1;
+}
+
+message PackageHistoryResponse {
+  string id = 1;
+  string status = 2;
+  optional string comment = 3;
+  string changedAt = 4;
+  string changedBy = 5;
+}
+
+message PackageResponse {
+  string id = 1;
+  string trackingCode = 2;
+  string clientId = 3;
+  string description = 4;
+  string destinationAddress = 5;
+  string status = 6;
+  repeated PackageHistoryResponse history = 7;
+  string createdAt = 8;
+  string updatedAt = 9;
+}
+
+message ListPackagesResponse {
+  repeated PackageResponse packages = 1;
+  int32 page = 2;
+  int32 limit = 3;
+  int32 total = 4;
+  int32 totalPages = 5;
+}

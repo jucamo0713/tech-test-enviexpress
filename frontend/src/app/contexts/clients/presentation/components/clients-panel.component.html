@@ -1,0 +1,16 @@
+<article class="panel">
+  <h2>Clientes</h2>
+  <form [formGroup]="form" (ngSubmit)="submit()">
+    <input placeholder="Nombre" formControlName="name" />
+    <input placeholder="Email" formControlName="email" />
+    <input placeholder="Telefono" formControlName="phone" />
+    <input placeholder="Direccion" formControlName="address" />
+    <button type="submit" [disabled]="form.invalid">Crear cliente</button>
+  </form>
+  <div class="list">
+    <button type="button" class="row" *ngFor="let client of clients" (click)="selectClient.emit(client)">
+      <strong>{{ client.name }}</strong>
+      <span>{{ client.email }}</span>
+    </button>
+  </div>
+</article>

@@ -1,0 +1,7 @@
+allowBuilds:
+  # Optional telemetry package; keep postinstall disabled.
+  '@scarf/scarf': false
+  argon2: true
+  grpc-tools: true
+  protobufjs: true
+  unrs-resolver: true

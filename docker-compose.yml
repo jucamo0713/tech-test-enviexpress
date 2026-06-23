@@ -1,0 +1,193 @@
+services:
+  mongo:
+    image: mongo:7
+    container_name: enviexpress-mongo
+    restart: unless-stopped
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo-data:/data/db
+    healthcheck:
+      test: ["CMD", "mongosh", "--quiet", "--eval", "db.adminCommand('ping').ok"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+  redis:
+    image: redis:7-alpine
+    container_name: enviexpress-redis
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+  api-gateway:
+    build:
+      context: ./backend
+      dockerfile: dockerfiles/api-gateway.Dockerfile
+    container_name: enviexpress-api-gateway
+    restart: unless-stopped
+    depends_on:
+      mongo:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      auth-ms:
+        condition: service_started
+      clients-ms:
+        condition: service_started
+      packages-ms:
+        condition: service_started
+      package-status-ms:
+        condition: service_started
+      audit-ms:
+        condition: service_started
+    environment: &backend-env
+      NODE_ENV: production
+      PORT: 3000
+      APP_NAME: enviexpress-backend
+      API_PREFIX: api
+      LOG_LEVEL: log
+      DEFAULT_TIMEOUT_MS: 30000
+      MONGO_ENABLED: "true"
+      MONGO_URI: mongodb://mongo:27017/enviexpress
+      REDIS_URL: redis://redis:6379
+      GRPC_AUTH_URL: auth-ms:50051
+      GRPC_USERS_URL: users-ms:50052
+      GRPC_CLIENTS_URL: clients-ms:50053
+      GRPC_PACKAGES_URL: packages-ms:50054
+      GRPC_PACKAGE_STATUS_URL: package-status-ms:50055
+      GRPC_AUDIT_URL: audit-ms:50056
+      JWT_ACCESS_SECRET: change-me-super-secret
+      JWT_ACCESS_EXPIRES_IN: 15m
+      SWAGGER_ENABLED: "true"
+      SWAGGER_PATH: docs
+      SWAGGER_TITLE: Enviexpress API
+      SWAGGER_DESCRIPTION: Enviexpress backend API documentation
+      SWAGGER_VERSION: 1.0.0
+    ports:
+      - "3001:3000"
+
+  auth-ms:
+    build:
+      context: ./backend
+      dockerfile: dockerfiles/auth-ms.Dockerfile
+    container_name: enviexpress-auth-ms
+    restart: unless-stopped
+    depends_on:
+      mongo:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      users-ms:
+        condition: service_started
+    environment:
+      <<: *backend-env
+      GRPC_AUTH_URL: 0.0.0.0:50051
+    expose:
+      - "50051"
+
+  users-ms:
+    build:
+      context: ./backend
+      dockerfile: dockerfiles/users-ms.Dockerfile
+    container_name: enviexpress-users-ms
+    restart: unless-stopped
+    depends_on:
+      mongo:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      packages-ms:
+        condition: service_started
+    environment:
+      <<: *backend-env
+      GRPC_USERS_URL: 0.0.0.0:50052
+    expose:
+      - "50052"
+
+  clients-ms:
+    build:
+      context: ./backend
+      dockerfile: dockerfiles/clients-ms.Dockerfile
+    container_name: enviexpress-clients-ms
+    restart: unless-stopped
+    depends_on:
+      mongo:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    environment:
+      <<: *backend-env
+      GRPC_CLIENTS_URL: 0.0.0.0:50053
+    expose:
+      - "50053"
+
+  packages-ms:
+    build:
+      context: ./backend
+      dockerfile: dockerfiles/packages-ms.Dockerfile
+    container_name: enviexpress-packages-ms
+    restart: unless-stopped
+    depends_on:
+      mongo:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    environment:
+      <<: *backend-env
+      GRPC_PACKAGES_URL: 0.0.0.0:50054
+    expose:
+      - "50054"
+
+  package-status-ms:
+    build:
+      context: ./backend
+      dockerfile: dockerfiles/package-status-ms.Dockerfile
+    container_name: enviexpress-package-status-ms
+    restart: unless-stopped
+    depends_on:
+      mongo:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    environment:
+      <<: *backend-env
+      GRPC_PACKAGE_STATUS_URL: 0.0.0.0:50055
+    expose:
+      - "50055"
+
+  audit-ms:
+    build:
+      context: ./backend
+      dockerfile: dockerfiles/audit-ms.Dockerfile
+    container_name: enviexpress-audit-ms
+    restart: unless-stopped
+    depends_on:
+      mongo:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    environment:
+      <<: *backend-env
+      GRPC_AUDIT_URL: 0.0.0.0:50056
+    expose:
+      - "50056"
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: enviexpress-frontend
+    restart: unless-stopped
+    depends_on:
+      - api-gateway
+    ports:
+      - "4200:80"
+
+volumes:
+  mongo-data:

@@ -1,0 +1,50 @@
+.panel {
+  background: #ffffff;
+  border: 1px solid #dbe4e7;
+  border-radius: 8px;
+  padding: 18px;
+}
+
+h2 {
+  font-size: 18px;
+  margin: 0 0 16px;
+}
+
+form {
+  display: grid;
+  gap: 10px;
+}
+
+input,
+select {
+  border: 1px solid #ccd7db;
+  border-radius: 6px;
+  font: inherit;
+  min-height: 40px;
+  padding: 8px 10px;
+}
+
+button {
+  background: #0f766e;
+  border: 0;
+  border-radius: 6px;
+  color: white;
+  cursor: pointer;
+  font: inherit;
+  min-height: 40px;
+}
+
+.tracking {
+  font-size: 22px;
+  font-weight: 800;
+}
+
+pre {
+  background: #0f172a;
+  border-radius: 6px;
+  color: #d1fae5;
+  font-size: 12px;
+  overflow: auto;
+  padding: 12px;
+  white-space: pre-wrap;
+}

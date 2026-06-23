@@ -1,0 +1,72 @@
+.auth-page {
+  align-items: center;
+  background: #f8fafc;
+  display: flex;
+  min-height: 100dvh;
+  padding: 20px;
+}
+
+form {
+  background: white;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  display: grid;
+  gap: 14px;
+  margin: 0 auto;
+  max-width: 420px;
+  padding: 24px;
+  width: 100%;
+}
+
+.eyebrow {
+  color: #0f766e;
+  font-size: 13px;
+  font-weight: 700;
+  margin: 0;
+  text-transform: uppercase;
+}
+
+h1 {
+  color: #0f172a;
+  font-size: 28px;
+  margin: 0;
+}
+
+label {
+  color: #334155;
+  display: grid;
+  gap: 6px;
+}
+
+input {
+  border: 1px solid #cbd5e1;
+  border-radius: 6px;
+  font: inherit;
+  min-height: 40px;
+  padding: 8px 10px;
+}
+
+button {
+  background: #0f766e;
+  border: 0;
+  border-radius: 6px;
+  color: white;
+  cursor: pointer;
+  font: inherit;
+  min-height: 42px;
+}
+
+button:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
+}
+
+a {
+  color: #2563eb;
+  text-decoration: none;
+}
+
+.error {
+  color: #b91c1c;
+  margin: 0;
+}

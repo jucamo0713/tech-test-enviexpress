@@ -1,0 +1,41 @@
+syntax = "proto3";
+
+package package_status;
+
+service PackageStatusService {
+  rpc Health (HealthRequest) returns (HealthResponse);
+  rpc GetPackageStatus (GetPackageStatusRequest) returns (PackageStatusResponse);
+  rpc TrackPackageStatus (TrackPackageStatusRequest) returns (stream PackageStatusResponse);
+}
+
+message HealthRequest {}
+
+message HealthResponse {
+  string status = 1;
+}
+
+message GetPackageStatusRequest {
+  string id = 1;
+}
+
+message TrackPackageStatusRequest {
+  string trackingCode = 1;
+  string email = 2;
+}
+
+message PackageStatusHistoryResponse {
+  string id = 1;
+  string status = 2;
+  optional string comment = 3;
+  string changedAt = 4;
+  string changedBy = 5;
+}
+
+message PackageStatusResponse {
+  string id = 1;
+  string trackingCode = 2;
+  string status = 3;
+  repeated PackageStatusHistoryResponse history = 4;
+  string updatedAt = 5;
+  string clientId = 6;
+}

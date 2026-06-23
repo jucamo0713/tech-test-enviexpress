@@ -1,0 +1,42 @@
+syntax = "proto3";
+
+package audit;
+
+service AuditService {
+  rpc Health (HealthRequest) returns (HealthResponse);
+  rpc CreateAuditRecord (CreateAuditRecordRequest) returns (AuditRecordResponse);
+  rpc ListAuditRecords (ListAuditRecordsRequest) returns (ListAuditRecordsResponse);
+}
+
+message HealthRequest {}
+
+message HealthResponse {
+  string status = 1;
+}
+
+message CreateAuditRecordRequest {
+  string entityType = 1;
+  string entityId = 2;
+  string action = 3;
+  string actorId = 4;
+  string metadata = 5;
+}
+
+message ListAuditRecordsRequest {
+  optional string entityType = 1;
+  optional string entityId = 2;
+}
+
+message AuditRecordResponse {
+  string id = 1;
+  string entityType = 2;
+  string entityId = 3;
+  string action = 4;
+  string actorId = 5;
+  string metadata = 6;
+  string createdAt = 7;
+}
+
+message ListAuditRecordsResponse {
+  repeated AuditRecordResponse records = 1;
+}

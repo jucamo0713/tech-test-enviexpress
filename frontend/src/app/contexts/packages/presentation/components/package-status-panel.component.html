@@ -1,0 +1,23 @@
+<article class="panel">
+  <h2>Estado</h2>
+  <ng-container *ngIf="selectedPackage; else empty">
+    <p class="tracking">{{ selectedPackage.trackingCode }}</p>
+    <p>{{ selectedPackage.destinationAddress }}</p>
+    <form [formGroup]="form" (ngSubmit)="submit()">
+      <select formControlName="status">
+        <option *ngFor="let status of statuses" [value]="status">{{ status }}</option>
+      </select>
+      <input placeholder="Comentario" formControlName="comment" />
+      <button type="submit">Actualizar</button>
+    </form>
+    <pre>{{ streamMessage }}</pre>
+    <ol>
+      <li *ngFor="let item of selectedPackage.history">
+        {{ item.status }} · {{ item.changedAt }}
+      </li>
+    </ol>
+  </ng-container>
+  <ng-template #empty>
+    <p>Selecciona un paquete para ver el heartbeat SSE.</p>
+  </ng-template>
+</article>

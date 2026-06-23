@@ -1,0 +1,11 @@
+<main class="login-page">
+  <form [formGroup]="form" (ngSubmit)="login()">
+    <p class="eyebrow">Enviexpress</p>
+    <h1>Login</h1>
+    <label>Email <input formControlName="email" /></label>
+    <label>Password <input type="password" formControlName="password" /></label>
+    <button type="submit" [disabled]="form.invalid">Entrar</button>
+    <a routerLink="/">Volver al inicio</a>
+    <p class="error" *ngIf="errorMessage">{{ errorMessage }}</p>
+  </form>
+</main>

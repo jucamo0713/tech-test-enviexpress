@@ -1,0 +1,31 @@
+<main class="app-shell">
+  <section class="topbar">
+    <div>
+      <p class="eyebrow">Enviexpress</p>
+      <h1>Operacion de paquetes</h1>
+    </div>
+    <div class="session" *ngIf="user() as currentUser">
+      <span>{{ currentUser.name }} · {{ currentUser.role }}</span>
+      <button type="button" (click)="refresh()">Refresh</button>
+      <button type="button" class="ghost" (click)="logout()">Cerrar sesion</button>
+    </div>
+  </section>
+
+  <section class="workspace">
+    <app-clients-panel
+      [clients]="clients"
+      (createClient)="createClient($event)"
+    />
+    <app-packages-panel
+      [clients]="clients"
+      [packages]="packages"
+      (createPackage)="createPackage($event)"
+      (selectPackage)="openPackage($event)"
+    />
+    <app-package-status-panel
+      [selectedPackage]="selectedPackage"
+      [streamMessage]="streamMessage"
+      (updateStatus)="updateStatus($event)"
+    />
+  </section>
+</main>

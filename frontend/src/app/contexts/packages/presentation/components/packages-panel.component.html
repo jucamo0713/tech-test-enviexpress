@@ -1,0 +1,19 @@
+<article class="panel">
+  <h2>Paquetes</h2>
+  <form [formGroup]="form" (ngSubmit)="submit()">
+    <select formControlName="clientId">
+      <option value="">Cliente</option>
+      <option *ngFor="let client of clients" [value]="client.id">{{ client.name }}</option>
+    </select>
+    <input placeholder="Descripcion" formControlName="description" />
+    <input placeholder="Destino" formControlName="destinationAddress" />
+    <button type="submit" [disabled]="form.invalid">Crear paquete</button>
+  </form>
+  <div class="list">
+    <button type="button" class="row" *ngFor="let packageItem of packages" (click)="selectPackage.emit(packageItem)">
+      <strong>{{ packageItem.trackingCode }}</strong>
+      <span>{{ packageItem.description }}</span>
+      <em>{{ packageItem.status }}</em>
+    </button>
+  </div>
+</article>

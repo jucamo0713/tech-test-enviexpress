@@ -32,7 +32,7 @@ export class AuthRefreshService {
       tap((auth) => this.session.setAuth(auth)),
       catchError((err) => {
         this.session.clear();
-        this.router.navigate(['/auth/login']);
+        this.router.navigate(['/login']);
         return throwError(() => err);
       }),
       finalize(() => {

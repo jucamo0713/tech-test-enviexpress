@@ -60,7 +60,11 @@ export class AuthSessionService {
 
   isRefreshTokenExpired(): boolean {
     const token = this.refreshToken();
-    return !token || this.isJwtExpired(token);
+    if (!token) return true;
+    if (token.includes('.')) {
+      return this.isJwtExpired(token);
+    }
+    return false;
   }
 
   private readStoredUser(): AuthUser | null {
